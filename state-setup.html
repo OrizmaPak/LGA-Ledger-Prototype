@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>State Setup | LGA Finance Operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="setup-body" data-page="state-setup">
+  <div class="setup-frame">
+    <header class="system-bar">
+      <a class="system-brand" href="index.html">
+        <span class="seal">RS</span>
+        <span class="system-title">
+          <strong>State Monitoring Setup</strong>
+          <span>Central oversight console</span>
+        </span>
+      </a>
+      <div class="system-actions">
+        <a class="button" href="index.html">Back</a>
+        <a class="button primary" href="state-dashboard.html">Open dashboard</a>
+      </div>
+    </header>
+
+    <main class="setup-workspace">
+      <section class="workspace-main">
+        <div class="page-topline">
+          <div>
+            <p class="kicker">State instance</p>
+            <h1>Create state instance</h1>
+            <p>Select the state from the API-fed list, enter the headquarters community, and define the populace identity for this instance.</p>
+          </div>
+          <span class="status-pill ok">Central instance</span>
+        </div>
+
+        <div class="select-grid">
+          <label class="field">
+            <span>State</span>
+            <select id="state-instance-state">
+              <option value="">Loading states...</option>
+            </select>
+            <small class="field-note" id="state-source-note">State list will load from the configured API source.</small>
+          </label>
+
+          <label class="field">
+            <span>Headquarters community</span>
+            <input id="state-instance-hq" type="text" placeholder="Type the headquarters community">
+            <small class="field-note">This is entered manually during instance creation.</small>
+          </label>
+        </div>
+
+        <div class="select-grid" style="margin-top: 14px;">
+          <label class="field">
+            <span>Populace identity</span>
+            <input id="state-instance-populace" type="text" placeholder="Type the identity of the populace">
+            <small class="field-note">Example: Rivers People, Lagosians, Akwa Ibom People.</small>
+          </label>
+
+          <div class="ops-panel">
+            <div class="panel-title">
+              <div>
+                <h2>Instance action</h2>
+                <p>Saving this form creates the prototype state instance locally.</p>
+              </div>
+            </div>
+            <div class="form-stack">
+              <button class="button primary full" id="save-state-instance" type="button">Create state instance</button>
+              <div class="save-feedback" id="state-instance-feedback">No state instance has been created in this browser yet.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ops-panel" style="margin-top: 14px;">
+          <div class="panel-title">
+            <div>
+              <h2>Created instance preview</h2>
+              <p>This block reflects the values saved for the current state instance.</p>
+            </div>
+          </div>
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>State</th>
+                <td id="instance-preview-state">Not selected</td>
+              </tr>
+              <tr>
+                <th>Headquarters community</th>
+                <td id="instance-preview-hq">Not provided</td>
+              </tr>
+              <tr>
+                <th>Populace identity</th>
+                <td id="instance-preview-populace">Not provided</td>
+              </tr>
+              <tr>
+                <th>Source</th>
+                <td id="instance-preview-source">Awaiting API load</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <aside class="workspace-side side-stack">
+        <div>
+          <p class="kicker">Instance summary</p>
+          <h2 id="summary-state-name">No state instance yet</h2>
+          <p id="summary-state-description">Create the state instance first. After that, the monitoring hub will use this saved identity.</p>
+        </div>
+        <div class="check-row">
+          <strong>Headquarters</strong>
+          <span id="summary-headquarters">Pending</span>
+        </div>
+        <div class="check-row">
+          <strong>Populace identity</strong>
+          <span id="summary-populace">Pending</span>
+        </div>
+        <div class="check-row">
+          <strong>Saved at</strong>
+          <span id="summary-saved-at">Not saved</span>
+        </div>
+        <a class="button primary full" href="state-dashboard.html">Open state dashboard</a>
+      </aside>
+    </main>
+  </div>
+
+  <script src="theme.js"></script>
+  <script src="state-setup.js"></script>
+</body>
+</html>

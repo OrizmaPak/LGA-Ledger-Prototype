@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | LGA Finance Operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-body" data-page="login">
+  <div class="login-frame">
+    <header class="system-bar login-bar">
+      <a class="system-brand" href="lga-setup.html">
+        <span class="seal">PH</span>
+        <span class="system-title">
+          <strong id="login-instance-name">Port Harcourt LGA</strong>
+          <span id="login-instance-meta">Rivers State / 2026 financial year</span>
+        </span>
+      </a>
+      <a class="button slim" href="lga-setup.html">Change instance</a>
+    </header>
+
+    <main class="login-workspace">
+      <section class="login-identity">
+        <div class="login-seal-wrap">
+          <span class="login-seal">PH</span>
+          <span class="status-pill ok">Verified instance</span>
+        </div>
+        <div>
+          <p class="kicker">LGA finance operations</p>
+          <h1 id="login-display-title">Port Harcourt LGA</h1>
+          <p id="login-display-meta">Rivers State command workspace for approvals, cash book, ledgers, reports, and sync monitoring.</p>
+        </div>
+
+        <div class="login-context-grid">
+          <div class="context-tile">
+            <span>State</span>
+            <strong id="login-selected-state">Rivers State</strong>
+          </div>
+          <div class="context-tile">
+            <span>Local government</span>
+            <strong id="login-selected-lga">Port Harcourt</strong>
+          </div>
+          <div class="context-tile">
+            <span>Role profile</span>
+            <strong>Super Admin</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="login-panel">
+        <div class="login-panel-head">
+          <div>
+            <p class="kicker">Authentication</p>
+            <h2>Sign in to continue</h2>
+          </div>
+          <span class="status-pill info">FY 2026</span>
+        </div>
+
+        <form class="login-form">
+          <label class="field">
+            <span>Email address</span>
+            <input type="email" value="superadmin@phalga.gov.ng" autocomplete="username">
+          </label>
+
+          <label class="field">
+            <span>Password</span>
+            <input type="password" value="password123" autocomplete="current-password">
+          </label>
+
+          <div class="login-options">
+            <label class="check-control">
+              <input type="checkbox" checked>
+              <span>Keep this instance active</span>
+            </label>
+            <a href="lga-setup.html">Switch LGA</a>
+          </div>
+
+          <div class="login-actions">
+            <a class="button primary login-submit" href="dashboard.html">Sign in</a>
+            <a class="button slim" href="lga-setup.html">Back</a>
+          </div>
+
+          <div class="access-note">
+            <strong>No credentials?</strong>
+            <span>The instance administrator must create your account before you can access this workspace.</span>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="theme.js"></script>
+  <script src="lga-setup.js"></script>
+</body>
+</html>

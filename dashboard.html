@@ -1,0 +1,414 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operations Dashboard | LGA Finance Operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="budget-admin.css">
+</head>
+<body data-page="dashboard">
+  <div class="app-shell">
+    <aside class="side-rail">
+      <a class="rail-brand" href="dashboard.html">
+        <span class="seal">PH</span>
+        <span class="rail-title">
+          <strong>PHALGA Finance</strong>
+          <span>Rivers State</span>
+        </span>
+      </a>
+
+      <nav class="nav-group">
+        <span class="nav-label">Control desk</span>
+        <a class="nav-item active" href="dashboard.html">
+          <span class="nav-icon">D</span>
+          <span>Dashboard</span>
+          <span class="nav-count">9</span>
+        </a>
+        <a class="nav-item" href="#">
+          <span class="nav-icon">Q</span>
+          <span>Work Queue</span>
+          <span class="nav-count">18</span>
+        </a>
+        <details class="nav-details">
+          <summary class="nav-parent">
+            <span class="nav-icon">B</span>
+            <span>Budget</span>
+            <span class="nav-chevron" aria-hidden="true"></span>
+          </summary>
+          <div class="nav-submenu">
+            <a href="departments-manage.html">Departments</a>
+            <a href="banks.html">Banks</a>
+            <a href="categories.html">Categories</a>
+            <a href="budget-items.html">Budget Items</a>
+            <a href="budget-year.html">Budget Year</a>
+            <a href="budget-funding.html">Budget Funding</a>
+            <a href="budget-imports.html">Imports</a>
+            <a href="budget-log.html">Log</a>
+          </div>
+        </details>
+        <details class="nav-details">
+          <summary class="nav-parent">
+            <span class="nav-icon">V</span>
+            <span>Vouchers</span>
+            <span class="nav-chevron" aria-hidden="true"></span>
+          </summary>
+          <div class="nav-submenu">
+            <a href="payments-voucher.html">Payments (PV)</a>
+            <a href="receipts-voucher.html">Receipts (ROV)</a>
+            <a href="approve-voucher.html">Checking</a>
+            <a href="passing-voucher.html">Passing</a>
+          </div>
+        </details>
+        <a class="nav-item" href="#">
+          <span class="nav-icon">C</span>
+          <span>Cash and Bank</span>
+        </a>
+        <a class="nav-item" href="#">
+          <span class="nav-icon">R</span>
+          <span>Reports</span>
+        </a>
+        <span class="nav-label">Administration</span>
+        <a class="nav-item" href="#">
+          <span class="nav-icon">U</span>
+          <span>Users and Roles</span>
+        </a>
+        <a class="nav-item" href="#">
+          <span class="nav-icon">S</span>
+          <span>Sync Monitor</span>
+          <span class="nav-count">6</span>
+        </a>
+        <a class="nav-item" href="#theme-management">
+          <span class="nav-icon">T</span>
+          <span>Theme</span>
+        </a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <header class="app-topbar">
+        <div class="search-box">
+          <span>Search records, payees, departments, voucher refs</span>
+        </div>
+        <div class="shell-actions">
+          <span class="status-pill ok">FY 2026</span>
+          <button class="shell-icon-button" type="button" title="Settings">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 8.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+              <path d="m4.8 13.4-.8-1.4.8-1.4 1.8-.3.9-1.6-.5-1.8 1.4-.8 1.4.8 1.6-.6.7-1.7h1.6l.7 1.7 1.6.6 1.4-.8 1.4.8-.5 1.8.9 1.6 1.8.3.8 1.4-.8 1.4-1.8.3-.9 1.6.5 1.8-1.4.8-1.4-.8-1.6.6-.7 1.7h-1.6l-.7-1.7-1.6-.6-1.4.8-1.4-.8.5-1.8-.9-1.6-1.8-.3Z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="1.5"/>
+            </svg>
+            <span class="sr-only">Settings</span>
+          </button>
+          <button class="shell-icon-button" type="button" title="Notifications">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 4a4 4 0 0 0-4 4v2.4c0 .7-.2 1.4-.6 2L6 14.8V16h12v-1.2l-1.4-2.4c-.4-.6-.6-1.3-.6-2V8a4 4 0 0 0-4-4Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/>
+              <path d="M10 18a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/>
+            </svg>
+            <span class="shell-icon-badge">3</span>
+            <span class="sr-only">Notifications</span>
+          </button>
+          <button class="shell-icon-button profile" type="button" title="Current profile: Super Admin">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M5 19a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"/>
+            </svg>
+            <span class="sr-only">Current profile</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="main-view">
+        <div class="view-header">
+          <div>
+            <p class="kicker">Operations dashboard</p>
+            <h1>Port Harcourt LGA command center</h1>
+            <p>Budget exposure, approvals, cash position, and state sync status in one operating view.</p>
+          </div>
+          <div class="inline-actions">
+            <a class="button" href="#">New record</a>
+            <a class="button primary" href="#theme-management">Theme settings</a>
+          </div>
+        </div>
+
+        <section class="metric-grid">
+          <article class="metric-card">
+            <p class="metric-label">Approved budget</p>
+            <div class="metric-value">
+              <strong>N500.0m</strong>
+              <span class="metric-delta good">72%</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width: 72%;"></div></div>
+          </article>
+          <article class="metric-card">
+            <p class="metric-label">Revenue received</p>
+            <div class="metric-value">
+              <strong>N120.0m</strong>
+              <span class="metric-delta warn">24%</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill warn" style="width: 24%;"></div></div>
+          </article>
+          <article class="metric-card">
+            <p class="metric-label">Expenditure</p>
+            <div class="metric-value">
+              <strong>N210.0m</strong>
+              <span class="metric-delta good">42%</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width: 42%;"></div></div>
+          </article>
+          <article class="metric-card">
+            <p class="metric-label">Cash balance</p>
+            <div class="metric-value">
+              <strong>N80.0m</strong>
+              <span class="metric-delta warn">Watch</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill warn" style="width: 38%;"></div></div>
+          </article>
+          <article class="metric-card">
+            <p class="metric-label">Sync backlog</p>
+            <div class="metric-value">
+              <strong>18</strong>
+              <span class="metric-delta warn">Retrying</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill danger" style="width: 31%;"></div></div>
+          </article>
+        </section>
+
+        <section class="dashboard-grid">
+          <div class="side-stack">
+            <section class="ops-panel table-shell">
+              <div class="panel-title">
+                <div>
+                  <h2>Approval and posting queue</h2>
+                  <p>Items requiring finance or approver action today.</p>
+                </div>
+                <span class="queue-count">18 open</span>
+              </div>
+              <div class="table-content enhanced-table">
+                <table class="data-table admin-table">
+                  <thead>
+                    <tr>
+                      <th>Reference</th>
+                      <th>Department</th>
+                      <th>Amount</th>
+                      <th>Stage</th>
+                      <th>Sync</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashboard-queue-body">
+                    <tr>
+                      <td>PV-2026-041</td>
+                      <td>Works</td>
+                      <td>N12.4m</td>
+                      <td><span class="status-pill warn">Approval</span></td>
+                      <td><span class="status-pill ok">Ready</span></td>
+                    </tr>
+                    <tr>
+                      <td>RV-2026-013</td>
+                      <td>Revenue</td>
+                      <td>N7.8m</td>
+                      <td><span class="status-pill ok">Posted</span></td>
+                      <td><span class="status-pill warn">Retrying</span></td>
+                    </tr>
+                    <tr>
+                      <td>ADV-2026-002</td>
+                      <td>Health</td>
+                      <td>N3.1m</td>
+                      <td><span class="status-pill info">Retirement</span></td>
+                      <td><span class="status-pill danger">Failed</span></td>
+                    </tr>
+                    <tr>
+                      <td>SAL-2026-006</td>
+                      <td>Payroll</td>
+                      <td>N46.0m</td>
+                      <td><span class="status-pill warn">Review</span></td>
+                      <td><span class="status-pill info">Pending</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="table-status-bar">
+                <span>Queue entries are prioritised for finance action.</span>
+                <span>Use the dashboard to monitor live operational pressure.</span>
+              </div>
+            </section>
+
+            <section class="operations-grid">
+              <article class="ops-panel">
+                <div class="panel-title">
+                  <div>
+                    <h2>Budget risk</h2>
+                    <p>Lines close to exhaustion.</p>
+                  </div>
+                </div>
+                <div class="risk-list">
+                  <div class="risk-row">
+                    <strong>Primary health works</strong>
+                    <span class="status-pill danger">91%</span>
+                  </div>
+                  <div class="risk-row">
+                    <strong>Road maintenance</strong>
+                    <span class="status-pill warn">78%</span>
+                  </div>
+                  <div class="risk-row">
+                    <strong>Education grants</strong>
+                    <span class="status-pill ok">46%</span>
+                  </div>
+                </div>
+              </article>
+
+              <article class="ops-panel">
+                <div class="panel-title">
+                  <div>
+                    <h2>Cash and bank</h2>
+                    <p>Operating balances.</p>
+                  </div>
+                </div>
+                <div class="cash-strip">
+                  <div class="cash-row">
+                    <span>Treasury Single Account</span>
+                    <strong>N42.6m</strong>
+                  </div>
+                  <div class="cash-row">
+                    <span>Revenue collection</span>
+                    <strong>N18.9m</strong>
+                  </div>
+                  <div class="cash-row">
+                    <span>Salary account</span>
+                    <strong>N18.5m</strong>
+                  </div>
+                </div>
+              </article>
+
+              <article class="ops-panel">
+                <div class="panel-title">
+                  <div>
+                    <h2>Audit trail</h2>
+                    <p>Latest protected actions.</p>
+                  </div>
+                </div>
+                <div class="timeline-list">
+                  <div class="timeline-row">
+                    <strong>Voucher posted</strong>
+                    <span>08:44</span>
+                  </div>
+                  <div class="timeline-row">
+                    <strong>Role updated</strong>
+                    <span>09:12</span>
+                  </div>
+                  <div class="timeline-row">
+                    <strong>Sync retry failed</strong>
+                    <span>09:30</span>
+                  </div>
+                </div>
+              </article>
+            </section>
+          </div>
+
+          <aside class="side-stack">
+            <section class="ops-panel">
+              <div class="panel-title">
+                <div>
+                  <h2>State sync health</h2>
+                  <p>Finalized records sent to the central database.</p>
+                </div>
+              </div>
+              <div class="workflow-list">
+                <div class="check-row">
+                  <strong>Synced today</strong>
+                  <span class="status-pill ok">126</span>
+                </div>
+                <div class="check-row">
+                  <strong>Pending sync</strong>
+                  <span class="status-pill warn">18</span>
+                </div>
+                <div class="check-row">
+                  <strong>Failed submissions</strong>
+                  <span class="status-pill danger">6</span>
+                </div>
+                <div class="check-row">
+                  <strong>Next retry</strong>
+                  <span>4 minutes</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="ops-panel">
+              <div class="panel-title">
+                <div>
+                  <h2>Setup completion</h2>
+                  <p>Instance readiness before full operation.</p>
+                </div>
+                <span class="status-pill warn">74%</span>
+              </div>
+              <div class="workflow-list">
+                <div class="check-row">
+                  <strong>Departments</strong>
+                  <span class="status-pill ok">Done</span>
+                </div>
+                <div class="check-row">
+                  <strong>Bank accounts</strong>
+                  <span class="status-pill warn">Review</span>
+                </div>
+                <div class="check-row">
+                  <strong>Opening balance</strong>
+                  <span class="status-pill warn">Pending</span>
+                </div>
+                <div class="check-row">
+                  <strong>Approval limits</strong>
+                  <span class="status-pill info">Draft</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="ops-panel" id="theme-management">
+              <div class="panel-title">
+                <div>
+                  <p class="kicker">Color team</p>
+                  <h2>Theme management</h2>
+                  <p>Identity colors are stored locally for this prototype.</p>
+                </div>
+              </div>
+              <div class="theme-layout">
+                <div class="theme-options">
+                  <button class="theme-chip active" type="button" data-theme-choice="green">
+                    <span class="swatch swatch-green"></span>
+                    Government Green
+                  </button>
+                  <button class="theme-chip" type="button" data-theme-choice="blue">
+                    <span class="swatch swatch-blue"></span>
+                    Administrative Blue
+                  </button>
+                  <button class="theme-chip" type="button" data-theme-choice="gold">
+                    <span class="swatch swatch-gold"></span>
+                    Civic Gold
+                  </button>
+                </div>
+                <div class="workflow-list">
+                  <div class="check-row">
+                    <strong>Layout</strong>
+                    <span>Shared</span>
+                  </div>
+                  <div class="check-row">
+                    <strong>Navigation</strong>
+                    <span>Shared</span>
+                  </div>
+                  <div class="check-row">
+                    <strong>Identity color</strong>
+                    <span>Per instance</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </aside>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="theme.js"></script>
+  <script src="budget-admin.js"></script>
+</body>
+</html>

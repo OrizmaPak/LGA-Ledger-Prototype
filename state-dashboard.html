@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>State Dashboard | LGA Finance Operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="setup-body">
+  <div class="setup-frame">
+    <header class="system-bar">
+      <a class="system-brand" href="state-setup.html">
+        <span class="seal">ST</span>
+        <span class="system-title">
+          <strong id="state-dashboard-name">State Monitoring Dashboard</strong>
+          <span id="state-dashboard-meta">Saved state instance preview</span>
+        </span>
+      </a>
+      <div class="system-actions">
+        <a class="button" href="state-setup.html">Back to setup</a>
+        <a class="button primary" href="dashboard.html">Open LGA dashboard</a>
+      </div>
+    </header>
+
+    <main class="setup-workspace">
+      <section class="workspace-main">
+        <div class="page-topline">
+          <div>
+            <p class="kicker">State monitoring</p>
+            <h1 id="state-dashboard-heading">No saved state instance</h1>
+            <p id="state-dashboard-description">Create a state instance first so the monitoring dashboard can inherit its identity.</p>
+          </div>
+          <span class="status-pill info" id="state-dashboard-status">Awaiting setup</span>
+        </div>
+
+        <div class="ops-panel">
+          <div class="panel-title">
+            <div>
+              <h2>Instance identity</h2>
+              <p>Saved values coming from the state setup screen.</p>
+            </div>
+          </div>
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th>State</th>
+                <td id="dashboard-preview-state">Not saved</td>
+              </tr>
+              <tr>
+                <th>Headquarters community</th>
+                <td id="dashboard-preview-hq">Not saved</td>
+              </tr>
+              <tr>
+                <th>Populace identity</th>
+                <td id="dashboard-preview-populace">Not saved</td>
+              </tr>
+              <tr>
+                <th>Last saved</th>
+                <td id="dashboard-preview-saved-at">Not saved</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <aside class="workspace-side side-stack">
+        <div>
+          <p class="kicker">Central note</p>
+          <h2>State instance follows setup data</h2>
+          <p>The monitoring environment can now inherit the selected state and the typed headquarters identity from the saved setup record.</p>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="theme.js"></script>
+  <script src="state-setup.js"></script>
+</body>
+</html>

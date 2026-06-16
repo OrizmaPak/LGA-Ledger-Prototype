@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LGA Setup | LGA Finance Operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="setup-body" data-page="lga-setup">
+  <div class="setup-frame">
+    <header class="system-bar">
+      <a class="system-brand" href="index.html">
+        <span class="seal">RS</span>
+        <span class="system-title">
+          <strong>Local Government Setup</strong>
+          <span>Operational accounting instance</span>
+        </span>
+      </a>
+      <div class="system-actions">
+        <a class="button" href="index.html">Back</a>
+        <a class="button primary slim" href="login.html">Login</a>
+      </div>
+    </header>
+
+    <main class="setup-workspace">
+      <section class="workspace-main">
+        <div class="page-topline">
+          <div>
+            <p class="kicker">LGA instance</p>
+            <h1>Select state and local government</h1>
+            <p>This creates the context before the super admin enters the accounting workspace.</p>
+          </div>
+          <span class="status-pill warn">Setup required</span>
+        </div>
+
+        <div class="select-grid">
+          <label class="field">
+            <span>State</span>
+            <select id="lga-instance-state">
+              <option value="">Loading states...</option>
+            </select>
+            <small class="field-note" id="lga-state-source-note">State list will load from the configured API source.</small>
+          </label>
+
+          <label class="field">
+            <span>Local government</span>
+            <select id="lga-instance-name">
+              <option value="">Select state first</option>
+            </select>
+            <small class="field-note" id="lga-source-note">Local governments will load after state selection.</small>
+          </label>
+        </div>
+
+        <div class="select-grid" style="margin-top: 14px;">
+          <div class="ops-panel">
+            <div class="panel-title">
+              <div>
+                <h2>Instance action</h2>
+                <p>Save the selected state and local government before sign-in.</p>
+              </div>
+            </div>
+            <div class="form-stack">
+              <button class="button primary full" id="save-lga-instance" type="button">Save LGA instance</button>
+              <div class="save-feedback" id="lga-instance-feedback">No LGA instance has been saved in this browser yet.</div>
+            </div>
+          </div>
+
+          <div class="ops-panel">
+            <div class="panel-title">
+              <div>
+                <h2>Selected instance preview</h2>
+                <p>The login screen will inherit this saved context.</p>
+              </div>
+            </div>
+            <table class="data-table">
+              <tbody>
+                <tr>
+                  <th>State</th>
+                  <td id="lga-preview-state">Not selected</td>
+                </tr>
+                <tr>
+                  <th>Local government</th>
+                  <td id="lga-preview-name">Not selected</td>
+                </tr>
+                <tr>
+                  <th>Source</th>
+                  <td id="lga-preview-source">Awaiting API load</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="ops-panel" style="margin-top: 14px;">
+          <div class="panel-title">
+            <div>
+              <h2>Instance readiness</h2>
+              <p>Compact checklist for what the admin must complete after login.</p>
+            </div>
+          </div>
+          <div class="workflow-list">
+            <div class="check-row">
+              <strong>Financial year</strong>
+              <span class="status-pill ok">2026 set</span>
+            </div>
+            <div class="check-row">
+              <strong>Departments</strong>
+              <span class="status-pill warn">6 pending review</span>
+            </div>
+            <div class="check-row">
+              <strong>Bank accounts</strong>
+              <span class="status-pill warn">Opening balance needed</span>
+            </div>
+            <div class="check-row">
+              <strong>Budget structure</strong>
+              <span class="status-pill info">Draft loaded</span>
+            </div>
+            <div class="check-row">
+              <strong>Users and roles</strong>
+              <span class="status-pill warn">Super admin only</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="workspace-side side-stack">
+        <div>
+          <p class="kicker">Selected instance</p>
+          <h2 id="lga-summary-name">No LGA instance yet</h2>
+          <p id="lga-summary-description">Save the LGA instance first. The authentication flow will then use this selected state and local government.</p>
+        </div>
+        <div class="check-row">
+          <strong>State</strong>
+          <span id="lga-summary-state">Pending</span>
+        </div>
+        <div class="check-row">
+          <strong>Instance role</strong>
+          <span>Super Admin</span>
+        </div>
+        <div class="check-row">
+          <strong>Saved at</strong>
+          <span id="lga-summary-saved-at">Not saved</span>
+        </div>
+        <a class="button primary slim" href="login.html">Login</a>
+      </aside>
+    </main>
+  </div>
+
+  <script src="theme.js"></script>
+  <script src="lga-setup.js"></script>
+</body>
+</html>
