@@ -84,7 +84,7 @@
         ? lgaInstance.state
         : stateInstance && stateInstance.state
           ? stateInstance.state
-          : "Rivers State",
+          : "Delta State",
       headquarters: stateInstance && stateInstance.headquarters ? stateInstance.headquarters : ""
     };
   }

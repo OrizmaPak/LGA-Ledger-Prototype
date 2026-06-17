@@ -217,6 +217,15 @@ p {
   color: var(--primary-strong);
 }
 
+.shell-icon-button.logout {
+  color: var(--red);
+}
+
+.shell-icon-button.logout:hover {
+  border-color: rgba(177, 61, 61, 0.26);
+  background: #fbebeb;
+}
+
 .shell-icon-badge {
   position: absolute;
   top: -4px;

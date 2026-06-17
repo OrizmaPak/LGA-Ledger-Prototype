@@ -285,8 +285,8 @@
     }
 
     var saved = loadJSON(STORAGE_KEY);
-    var state = saved && saved.state ? saved.state : "Rivers State";
-    var lga = saved && saved.lga ? saved.lga : "Port Harcourt LGA";
+    var state = saved && saved.state ? saved.state : "Delta State";
+    var lga = saved && saved.lga ? saved.lga : "Ukwuani Local Government Council";
     var lgaShortName = lga.replace(/\s+LGA$/, "");
 
     $("login-instance-name").textContent = lga;

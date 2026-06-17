@@ -116,20 +116,18 @@
     var lgaInstance = loadJSON(LGA_INSTANCE_KEY);
     var stateInstance = loadJSON(STATE_INSTANCE_KEY);
     var title = lgaInstance && lgaInstance.lga ? lgaInstance.lga : "";
-    var state = lgaInstance && lgaInstance.state ? lgaInstance.state : (stateInstance && stateInstance.state ? stateInstance.state : "");
+    var state = lgaInstance && lgaInstance.state ? lgaInstance.state : (stateInstance && stateInstance.state ? stateInstance.state : "Delta State");
     var headquarters = stateInstance && stateInstance.headquarters ? stateInstance.headquarters : "";
     var subtitleParts = [];
 
-    if (state) {
-      subtitleParts.push(state);
-    }
+    subtitleParts.push(state);
 
     if (headquarters) {
       subtitleParts.push(headquarters);
     }
 
-    if (!title && state) {
-      title = state + " Monitoring Hub";
+    if (!title) {
+      title = "Ukwuani Local Government Council";
     }
 
     return {
@@ -142,8 +140,8 @@
   function activeInstanceContext() {
     var identity = buildInstanceIdentity();
     return {
-      state: identity.subtitle.split(" / ")[0] || "Rivers State",
-      lga: identity.title || "Port Harcourt LGA"
+      state: identity.subtitle.split(" / ")[0] || "Delta State",
+      lga: identity.title || "Ukwuani Local Government Council"
     };
   }
 
@@ -404,6 +402,11 @@
         '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a4 4 0 0 0-4 4v2.4c0 .7-.2 1.4-.6 2L6 14.8V16h12v-1.2l-1.4-2.4c-.4-.6-.6-1.3-.6-2V8a4 4 0 0 0-4-4Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/><path d="M10 18a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/></svg>' +
         '<span class="shell-icon-badge">' + badge + '</span><span class="sr-only">Notifications</span></button><div class="shell-dropdown notifications-dropdown" hidden></div></div>';
     }
+    if (type === "logout") {
+      return '<button class="' + classes + '" type="button" title="' + title + '" data-shell-action="logout">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6H6.8A1.8 1.8 0 0 0 5 7.8v8.4A1.8 1.8 0 0 0 6.8 18H10" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/><path d="M14 8l4 4-4 4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/><path d="M18 12H10" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"/></svg>' +
+        '<span class="sr-only">Log out</span></button>';
+    }
     return '<button class="' + classes + '" type="button" title="' + title + '" data-shell-action="profile">' +
       '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 19a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"/></svg>' +
       '<span class="sr-only">Current profile</span></button>';
@@ -481,6 +484,9 @@
       var profileButton = actions.querySelector('[data-shell-action="profile"]') || Array.from(actions.querySelectorAll(".shell-icon-button")).find(function (button) {
         return button.classList.contains("profile") || /current profile|profile/i.test(button.getAttribute("title") || "");
       });
+      var logoutButton = actions.querySelector('[data-shell-action="logout"]') || Array.from(actions.querySelectorAll(".shell-icon-button")).find(function (button) {
+        return /logout|log out/i.test(button.getAttribute("title") || "");
+      });
 
       if (settingsButton) {
         settingsButton.setAttribute("data-shell-action", "settings");
@@ -514,6 +520,13 @@
       }
       profileButton = actions.querySelector('[data-shell-action="profile"]');
       profileButton.setAttribute("title", "Current profile: " + profile.role);
+
+      if (logoutButton) {
+        logoutButton.setAttribute("data-shell-action", "logout");
+        logoutButton.classList.add("logout");
+      } else {
+        actions.insertAdjacentHTML("beforeend", shellButtonMarkup("logout", "Log out", "logout"));
+      }
     });
   }
 
@@ -537,6 +550,16 @@
       button.setAttribute("title", "Current profile: " + profile.role);
       button.addEventListener("click", function () {
         window.location.href = "profile.html";
+      });
+    });
+    document.querySelectorAll('[data-shell-action="logout"]').forEach(function (button) {
+      button.addEventListener("click", function () {
+        try {
+          localStorage.removeItem(CURRENT_USER_KEY);
+        } catch (error) {
+          return;
+        }
+        window.location.href = "login.html";
       });
     });
     document.querySelectorAll(".notifications-dropdown").forEach(renderNotificationsDropdown);
