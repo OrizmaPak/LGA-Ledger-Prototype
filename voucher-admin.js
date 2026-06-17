@@ -1,19 +1,56 @@
 (function () {
   var STORE = {
     departments: "budget-admin-departments",
+    banks: "budget-admin-banks",
     categories: "budget-admin-categories",
     items: "budget-admin-items",
+    advances: "voucher-advance-records",
     vouchers: "voucher-payment-records",
+    receipts: "voucher-receipt-records",
     logs: "budget-admin-logs"
   };
+  var LGA_INSTANCE_KEY = "lga-instance-selection";
+  var STATE_INSTANCE_KEY = "lga-state-instance";
   var CURRENT_ACTOR = "Super Admin";
   var CURRENT_NAME = "Tamuno Briggs";
-  var LOCAL_GOVERNMENT_NAME = "Port Harcourt LGA";
-  var STATE_NAME = "Rivers State";
+  var ACTIVE_INSTANCE = loadActiveInstance();
+  var LOCAL_GOVERNMENT_NAME = ACTIVE_INSTANCE.localGovernmentName;
+  var STATE_NAME = ACTIVE_INSTANCE.stateName;
   var TABLE_STATE = {};
   var viewVoucherId = "";
+  var viewReceiptId = "";
+  var receiptApprovalId = "";
   var checkingVoucherId = "";
   var passingVoucherId = "";
+  var checkingRefreshPage = function () {};
+  var passingRefreshPage = function () {};
+  var receiptApprovalRefreshPage = function () {};
+  var receiptRefreshPage = function () {};
+  var receiptEntryMode = "classification";
+  var selectedAdvanceId = "";
+  var checkingPageState = {
+    tab: "pending",
+    date: "",
+    view: "table",
+    detailVoucherId: "",
+    selected: {
+      pending: "",
+      checked: "",
+      rejected: ""
+    }
+  };
+  var passingPageState = {
+    view: "table",
+    detailVoucherId: ""
+  };
+  var receiptPageState = {
+    view: "table",
+    detailReceiptId: ""
+  };
+  var receiptApprovalPageState = {
+    view: "table",
+    detailReceiptId: ""
+  };
   var uploadedDocumentNames = [];
   var currentEntryMode = "classification";
   var SYSTEM_USERS = [
@@ -24,6 +61,33 @@
     "Sarah Duke",
     "A. Peters"
   ];
+
+  function loadActiveInstance() {
+    var lgaInstance = null;
+    var stateInstance = null;
+
+    try {
+      lgaInstance = JSON.parse(localStorage.getItem(LGA_INSTANCE_KEY) || "null");
+    } catch (error) {
+      lgaInstance = null;
+    }
+
+    try {
+      stateInstance = JSON.parse(localStorage.getItem(STATE_INSTANCE_KEY) || "null");
+    } catch (error) {
+      stateInstance = null;
+    }
+
+    return {
+      localGovernmentName: lgaInstance && lgaInstance.lga ? lgaInstance.lga : "Port Harcourt LGA",
+      stateName: lgaInstance && lgaInstance.state
+        ? lgaInstance.state
+        : stateInstance && stateInstance.state
+          ? stateInstance.state
+          : "Rivers State",
+      headquarters: stateInstance && stateInstance.headquarters ? stateInstance.headquarters : ""
+    };
+  }
 
   var seedDepartments = [
     { id: "dept-health", code: "HLT", name: "Health", status: "Active" },
@@ -45,6 +109,53 @@
     { id: "item-drainage-desilt", categoryId: "cat-works-roads", code: "230102", name: "Drainage desilting works" },
     { id: "item-school-support", categoryId: "cat-education-grants", code: "210501", name: "School support grants" }
   ];
+  var seedAdvances = [
+    {
+      id: "adv-001",
+      reference: "ADV-2026-014",
+      holderName: "Rivers Builders Ltd",
+      departmentId: "dept-works",
+      categoryId: "cat-works-roads",
+      economicCodeId: "item-road-repairs",
+      paymentMethod: "bank-zenith-main",
+      purpose: "Road survey and mobilisation",
+      originalAmount: 2500000,
+      retiredAmount: 750000,
+      date: "2026-06-10"
+    },
+    {
+      id: "adv-002",
+      reference: "ADV-2026-018",
+      holderName: "Health Outreach Team",
+      departmentId: "dept-health",
+      categoryId: "cat-health-capital",
+      economicCodeId: "item-health-equipment",
+      paymentMethod: "bank-first-projects",
+      purpose: "Clinic equipment logistics",
+      originalAmount: 1800000,
+      retiredAmount: 400000,
+      date: "2026-06-11"
+    },
+    {
+      id: "adv-003",
+      reference: "ADV-2026-022",
+      holderName: "Sarah Duke",
+      departmentId: "dept-education",
+      categoryId: "cat-education-grants",
+      economicCodeId: "item-school-support",
+      paymentMethod: "cash",
+      purpose: "School support field visit",
+      originalAmount: 950000,
+      retiredAmount: 0,
+      date: "2026-06-13"
+    }
+  ];
+  var fallbackBanks = [
+    { id: "bank-cash", name: "Cash", description: "Cash float handled directly at the treasury desk.", accountName: "Cash on Hand" },
+    { id: "bank-zenith-main", name: "Zenith Bank", description: "Primary operations account for statutory collections and daily treasury postings.", accountName: "PHALGA Main Treasury" },
+    { id: "bank-first-projects", name: "First Bank", description: "Capital projects account used for infrastructure and intervention disbursements.", accountName: "PHALGA Capital Projects" },
+    { id: "bank-uba-salary", name: "UBA", description: "Salary and payroll settlement account for approved staff payments.", accountName: "PHALGA Payroll Services" }
+  ];
   var seedVouchers = [
     {
       id: "pv-2026-040",
@@ -52,6 +163,7 @@
       stateName: STATE_NAME,
       voucherNumber: "PV-2026-040",
       voucherDate: "2026-06-12",
+      paymentMethod: "bank-zenith-main",
       payToEntries: [
         { id: "payto-040-1", name: "Rivers Builders Ltd", description: "Township road resurfacing mobilisation" },
         { id: "payto-040-2", name: "Drainage Response Unit", description: "Drainage shoulder repairs" }
@@ -84,15 +196,15 @@
       ],
       supportingDocuments: ["award-letter.pdf", "road-schedule.xlsx"],
       totalAmount: 12400000,
-      status: "Passed",
+      status: "Passing",
       rejectionNote: "",
       createdAt: "2026-06-12T08:10:00Z",
       checkedAt: "2026-06-12T09:00:00Z",
-      passedAt: "2026-06-12T10:42:00Z",
+      passedAt: "",
       rejectedAt: "",
       createdBy: CURRENT_NAME,
       checkedByWorkflow: "Amaka George",
-      passedByWorkflow: CURRENT_NAME
+      passedByWorkflow: ""
     },
     {
       id: "pv-2026-041",
@@ -100,6 +212,7 @@
       stateName: STATE_NAME,
       voucherNumber: "PV-2026-041",
       voucherDate: "2026-06-13",
+      paymentMethod: "cash",
       payToEntries: [
         { id: "payto-041-1", name: "Chinedu Okoro", description: "Medical supply reimbursement" }
       ],
@@ -147,6 +260,7 @@
       stateName: STATE_NAME,
       voucherNumber: "PV-2026-042",
       voucherDate: "2026-06-14",
+      paymentMethod: "bank-first-projects",
       payToEntries: [
         { id: "payto-042-1", name: "Bright Future Initiative", description: "School support grant batch 1" }
       ],
@@ -166,7 +280,7 @@
       ],
       supportingDocuments: ["grant-memo.pdf", "beneficiary-list.xlsx"],
       totalAmount: 3500000,
-      status: "Draft",
+      status: "Rejected",
       rejectionNote: "Return to draft after memo reference mismatch.",
       createdAt: "2026-06-14T08:15:00Z",
       checkedAt: "",
@@ -175,6 +289,90 @@
       createdBy: CURRENT_NAME,
       checkedByWorkflow: "",
       passedByWorkflow: ""
+    },
+    {
+      id: "pv-2026-043",
+      localGovernmentName: LOCAL_GOVERNMENT_NAME,
+      stateName: STATE_NAME,
+      voucherNumber: "PV-2026-043",
+      voucherDate: "2026-06-15",
+      paymentMethod: "bank-uba-salary",
+      payToEntries: [
+        { id: "payto-043-1", name: "Riverline Services", description: "Administrative support release" }
+      ],
+      classifications: [
+        {
+          id: "class-043-1",
+          mode: "classification",
+          departmentId: "dept-finance",
+          categoryId: "cat-admin-services",
+          itemId: "item-health-equipment",
+          advancedUser: "",
+          generalDescription: "Administrative support funding.",
+          checkedBy: "",
+          passedBy: "",
+          amount: 1800000
+        }
+      ],
+      supportingDocuments: ["support-note.pdf"],
+      totalAmount: 1800000,
+      status: "Checked",
+      rejectionNote: "",
+      createdAt: "2026-06-15T08:15:00Z",
+      checkedAt: "2026-06-15T09:00:00Z",
+      passedAt: "",
+      rejectedAt: "",
+      createdBy: "Ebiere Lawson",
+      checkedByWorkflow: CURRENT_NAME,
+      passedByWorkflow: ""
+    }
+  ];
+  var seedReceipts = [
+    {
+      id: "rov-2026-014",
+      localGovernmentName: LOCAL_GOVERNMENT_NAME,
+      stateName: STATE_NAME,
+      treasuryReceiptVoucherNumber: "TRV-2026-014",
+      receiptNo: "RCPT-2026-101",
+      departmentId: "dept-finance",
+      categoryId: "cat-health-capital",
+      economicCodeId: "item-health-equipment",
+      paymentMethod: "bank-zenith-main",
+      receivedFrom: "Rivers Contractors Ltd",
+      amount: 2450000,
+      purpose: "Settlement for treasury service revenue and permit fees.",
+      cashierSignature: "Tamuno Briggs",
+      cashierName: "Tamuno Briggs",
+      date: "2026-06-15",
+      payerName: "T. Bright",
+      witnessName: "Ebiere Lawson",
+      status: "Approval",
+      createdAt: "2026-06-15T10:00:00Z",
+      updatedAt: "2026-06-15T10:00:00Z",
+      createdBy: CURRENT_NAME
+    },
+    {
+      id: "rov-2026-015",
+      localGovernmentName: LOCAL_GOVERNMENT_NAME,
+      stateName: STATE_NAME,
+      treasuryReceiptVoucherNumber: "TRV-2026-015",
+      receiptNo: "RCPT-2026-102",
+      departmentId: "dept-health",
+      categoryId: "cat-works-roads",
+      economicCodeId: "item-road-repairs",
+      paymentMethod: "cash",
+      receivedFrom: "Community Health Board",
+      amount: 880000,
+      purpose: "Cash receipt for health centre support and related fees.",
+      cashierSignature: "Amaka George",
+      cashierName: "Amaka George",
+      date: "2026-06-16",
+      payerName: "Community Liaison",
+      witnessName: "Sarah Duke",
+      status: "Approved",
+      createdAt: "2026-06-16T09:30:00Z",
+      updatedAt: "2026-06-16T09:30:00Z",
+      createdBy: "Amaka George"
     }
   ];
 
@@ -203,6 +401,7 @@
   function data() {
     return {
       departments: read(STORE.departments, seedDepartments),
+      banks: read(STORE.banks, fallbackBanks),
       categories: read(STORE.categories, seedCategories),
       items: read(STORE.items, seedItems)
     };
@@ -269,6 +468,33 @@
     }).join("");
   }
 
+  function getPaymentMethods() {
+    var methods = [{ id: "cash", name: "Cash" }];
+    var banks = data().banks || [];
+    banks.forEach(function (bank) {
+      if (!bank || !bank.id) {
+        return;
+      }
+      if (String(bank.id).toLowerCase() === "bank-cash" || String(bank.name || "").toLowerCase() === "cash") {
+        return;
+      }
+      methods.push({ id: bank.id, name: bank.name });
+    });
+    return methods;
+  }
+
+  function paymentMethodLabel(methodId) {
+    var method = getPaymentMethods().find(function (item) { return item.id === methodId; });
+    if (method) {
+      return method.name;
+    }
+    if (methodId) {
+      var bank = byId(data().banks, methodId);
+      return bank ? bank.name : methodId;
+    }
+    return "-";
+  }
+
   function slug(text) {
     return String(text || "")
       .toLowerCase()
@@ -280,8 +506,10 @@
     var type = "info";
     if (status === "Checking" || status === "Passing") {
       type = "warn";
-    } else if (status === "Passed") {
+    } else if (status === "Checked") {
       type = "ok";
+    } else if (status === "Rejected") {
+      type = "danger";
     }
     return '<span class="status-pill ' + type + '">' + escapeHtml(status) + "</span>";
   }
@@ -294,8 +522,10 @@
     }
     if (status === "Checking" || status === "Passing") {
       type = "warn";
-    } else if (status === "Passed") {
+    } else if (status === "Checked") {
       type = "ok";
+    } else if (status === "Rejected") {
+      type = "danger";
     }
     element.className = "status-pill " + type;
     element.textContent = status;
@@ -307,11 +537,34 @@
     });
   }
 
+  function getReceipts() {
+    return read(STORE.receipts, seedReceipts).map(normalizeReceipt).sort(function (left, right) {
+      return String(right.date || "").localeCompare(String(left.date || ""));
+    });
+  }
+
   function normalizePayToEntry(raw) {
     return {
       id: raw && raw.id ? raw.id : "payto-" + Date.now(),
       name: raw && raw.name ? raw.name : "",
       description: raw && raw.description ? raw.description : ""
+    };
+  }
+
+  function normalizeAdvance(raw) {
+    var base = raw || {};
+    return {
+      id: base.id || "adv-" + Date.now(),
+      reference: base.reference || "",
+      holderName: base.holderName || "",
+      departmentId: base.departmentId || "",
+      categoryId: base.categoryId || "",
+      economicCodeId: base.economicCodeId || "",
+      paymentMethod: base.paymentMethod || "cash",
+      purpose: base.purpose || "",
+      originalAmount: Number(base.originalAmount || 0) || 0,
+      retiredAmount: Number(base.retiredAmount || 0) || 0,
+      date: base.date || ""
     };
   }
 
@@ -341,6 +594,7 @@
       stateName: base.stateName || STATE_NAME,
       voucherNumber: base.voucherNumber || "",
       voucherDate: base.voucherDate || new Date().toISOString().slice(0, 10),
+      paymentMethod: base.paymentMethod || "cash",
       payToEntries: payToEntries,
       classifications: classifications,
       supportingDocuments: Array.isArray(base.supportingDocuments) ? base.supportingDocuments : [],
@@ -355,6 +609,52 @@
       checkedByWorkflow: base.checkedByWorkflow || "",
       passedByWorkflow: base.passedByWorkflow || ""
     };
+  }
+
+  function normalizeReceipt(raw) {
+    var base = raw || {};
+    return {
+      id: base.id || "rov-" + slug(base.treasuryReceiptVoucherNumber || base.receiptNo || Date.now()),
+      localGovernmentName: base.localGovernmentName || LOCAL_GOVERNMENT_NAME,
+      stateName: base.stateName || STATE_NAME,
+      entryMode: base.entryMode === "retireAdvance" ? "retireAdvance" : "classification",
+      advanceId: base.advanceId || "",
+      advanceReference: base.advanceReference || "",
+      advanceHolderName: base.advanceHolderName || "",
+      advanceDepartmentId: base.advanceDepartmentId || "",
+      advanceCategoryId: base.advanceCategoryId || "",
+      advanceEconomicCodeId: base.advanceEconomicCodeId || "",
+      advancePaymentMethod: base.advancePaymentMethod || "",
+      advancePurpose: base.advancePurpose || "",
+      advanceOriginalAmount: Number(base.advanceOriginalAmount || 0) || 0,
+      advanceRetiredAmount: Number(base.advanceRetiredAmount || 0) || 0,
+      advanceBalance: Number(base.advanceBalance || 0) || 0,
+      retirePaymentMethod: base.retirePaymentMethod || "",
+      treasuryReceiptVoucherNumber: base.treasuryReceiptVoucherNumber || "",
+      receiptNo: base.receiptNo || "",
+      departmentId: base.departmentId || "",
+      categoryId: base.categoryId || "",
+      economicCodeId: base.economicCodeId || "",
+      paymentMethod: base.paymentMethod || "cash",
+      receivedFrom: base.receivedFrom || "",
+      amount: Number(base.amount || 0) || 0,
+      purpose: base.purpose || "",
+      cashierSignature: base.cashierSignature || "",
+      cashierName: base.cashierName || "",
+      date: base.date || new Date().toISOString().slice(0, 10),
+      payerName: base.payerName || "",
+      witnessName: base.witnessName || "",
+      status: base.status || "Saved",
+      createdAt: base.createdAt || "",
+      updatedAt: base.updatedAt || "",
+      createdBy: base.createdBy || ""
+    };
+  }
+
+  function getAdvances() {
+    return read(STORE.advances, seedAdvances).map(normalizeAdvance).sort(function (left, right) {
+      return String(right.date || "").localeCompare(String(left.date || ""));
+    });
   }
 
   function rowSearchText(markup) {
@@ -804,27 +1104,111 @@
     });
   }
 
-  function ensureEntryCardsForMode(mode) {
-    if (!document.querySelector(".voucher-classification-card")) {
-      addClassificationCard(null, false, mode);
+  function ensureEntryModeModal() {
+    var existing = $("pv-entry-mode-modal");
+    var overlay;
+    var dialog;
+    var title;
+    var message;
+    var cancelButton;
+    var confirmButton;
+
+    if (existing) {
+      return existing;
     }
+
+    overlay = document.createElement("div");
+    overlay.id = "pv-entry-mode-modal";
+    overlay.className = "voucher-modal-overlay";
+    overlay.hidden = true;
+    overlay.innerHTML =
+      '<div class="voucher-modal" role="dialog" aria-modal="true" aria-labelledby="pv-entry-mode-title" aria-describedby="pv-entry-mode-message">' +
+      '<div class="voucher-modal-hero">' +
+      '<div class="voucher-modal-badge">!</div>' +
+      '<div>' +
+      '<p class="voucher-modal-kicker">Confirmation needed</p>' +
+      '<h3 id="pv-entry-mode-title">Switch entry mode?</h3>' +
+      '<p id="pv-entry-mode-message"></p>' +
+      "</div>" +
+      "</div>" +
+      '<div class="voucher-modal-actions">' +
+      '<button class="button slim" type="button" data-modal-cancel>Cancel</button>' +
+      '<button class="button primary slim" type="button" data-modal-confirm>Yes, switch</button>' +
+      "</div>" +
+      "</div>";
+
+    document.body.appendChild(overlay);
+    dialog = overlay.querySelector(".voucher-modal");
+    title = overlay.querySelector("#pv-entry-mode-title");
+    message = overlay.querySelector("#pv-entry-mode-message");
+    cancelButton = overlay.querySelector("[data-modal-cancel]");
+    confirmButton = overlay.querySelector("[data-modal-confirm]");
+
+    overlay.addEventListener("click", function (event) {
+      if (event.target === overlay) {
+        hideEntryModeModal(false);
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (!overlay.hidden && event.key === "Escape") {
+        hideEntryModeModal(false);
+      }
+    });
+
+    cancelButton.addEventListener("click", function () {
+      hideEntryModeModal(false);
+    });
+    confirmButton.addEventListener("click", function () {
+      hideEntryModeModal(true);
+    });
+
+    overlay._modalApi = {
+      title: title,
+      message: message,
+      confirmButton: confirmButton
+    };
+
+    return overlay;
+  }
+
+  var entryModeModalResolver = null;
+  var entryModeModalOpen = false;
+
+  function hideEntryModeModal(confirmed) {
+    var modal = $("pv-entry-mode-modal");
+    if (modal) {
+      modal.hidden = true;
+    }
+    entryModeModalOpen = false;
+    if (entryModeModalResolver) {
+      entryModeModalResolver(Boolean(confirmed));
+      entryModeModalResolver = null;
+    }
+  }
+
+  function showEntryModeModal(nextMode) {
+    var modal = ensureEntryModeModal();
+    var targetMode = nextMode === "advanced" ? "advanced" : "classification";
+    var readableTarget = targetMode === "advanced" ? "Advanced" : "Classification";
+    var readableSource = currentEntryMode === "advanced" ? "Advanced" : "Classification";
+    var messageText = "Any data entered in the current " + readableSource + " entries will be lost. Are you sure you want to switch to " + readableTarget + "?";
+
+    modal._modalApi.title.textContent = "Switch to " + readableTarget + "?";
+    modal._modalApi.message.textContent = messageText;
+    modal.hidden = false;
+    entryModeModalOpen = true;
+    modal._modalApi.confirmButton.focus();
+
+    return new Promise(function (resolve) {
+      entryModeModalResolver = resolve;
+    });
   }
 
   function confirmEntryModeSwitch(nextMode) {
     var targetMode = nextMode === "advanced" ? "advanced" : "classification";
-    var losingMode = targetMode === "advanced" ? "classification" : "advanced";
     var entries = collectClassifications();
-    var entriesToRemove = entries.filter(function (entry) {
-      return entry.mode === losingMode;
-    });
-
-    if (!entriesToRemove.length) {
-      setCurrentEntryMode(targetMode);
-      ensureEntryCardsForMode(targetMode);
-      return;
-    }
-
-    var hasDataToLose = entriesToRemove.some(function (entry) {
+    var hasDataToLose = entries.some(function (entry) {
       return entry.generalDescription ||
         entry.amount ||
         entry.departmentId ||
@@ -833,32 +1217,38 @@
         entry.advancedUser;
     });
 
-    if (!hasDataToLose) {
-      setCurrentEntryMode(targetMode);
-      ensureEntryCardsForMode(targetMode);
+    if (targetMode === currentEntryMode) {
       return;
     }
 
-    var proceed = window.confirm(
-      "Are you sure you want to switch to " +
-      (targetMode === "advanced" ? "Advanced" : "Classification") +
-      "? You will lose your " +
-      (losingMode === "advanced" ? "Advanced" : "Classification") +
-      " data on this form."
-    );
+    if (hasDataToLose) {
+      if (entryModeModalOpen) {
+        return;
+      }
+      showEntryModeModal(targetMode).then(function (confirmed) {
+        if (!confirmed) {
+          setCurrentEntryMode(currentEntryMode);
+          return;
+        }
 
-    if (!proceed) {
-      setCurrentEntryMode(currentEntryMode);
+        if ($("pv-classification-list")) {
+          $("pv-classification-list").innerHTML = "";
+        }
+        setCurrentEntryMode(targetMode);
+        addClassificationCard(null, false, targetMode);
+        updateVoucherSummary();
+        feedback("pv-manage-feedback", "Switched to " + (targetMode === "advanced" ? "Advanced" : "Classification") + " entry mode.", "success");
+      });
       return;
     }
 
-    renderClassificationCards(entries.filter(function (entry) {
-      return entry.mode === targetMode;
-    }), false);
+    if ($("pv-classification-list")) {
+      $("pv-classification-list").innerHTML = "";
+    }
     setCurrentEntryMode(targetMode);
-    ensureEntryCardsForMode(targetMode);
+    addClassificationCard(null, false, targetMode);
     updateVoucherSummary();
-    feedback("pv-manage-feedback", (losingMode === "advanced" ? "Advanced" : "Classification") + " entries removed. You are now in " + (targetMode === "advanced" ? "Advanced" : "Classification") + " mode.", "success");
+    feedback("pv-manage-feedback", "Switched to " + (targetMode === "advanced" ? "Advanced" : "Classification") + " entry mode.", "success");
   }
 
   function populateVoucherForm(voucher) {
@@ -867,6 +1257,7 @@
     }
     setFieldValue("pv-voucher-number", voucher.voucherNumber);
     setFieldValue("pv-voucher-date", voucher.voucherDate);
+    setFieldValue("pv-payment-method", voucher.paymentMethod || "cash");
     renderPayToRows(voucher.payToEntries, voucher.status !== "Draft");
     renderClassificationCards(voucher.classifications, voucher.status !== "Draft");
     bindDocumentInput(voucher.supportingDocuments);
@@ -882,6 +1273,7 @@
       stateName: STATE_NAME,
       voucherNumber: getFieldValue("pv-voucher-number"),
       voucherDate: getFieldValue("pv-voucher-date") || new Date().toISOString().slice(0, 10),
+      paymentMethod: getFieldValue("pv-payment-method") || "cash",
       payToEntries: collectPayToRows(),
       classifications: classifications,
       supportingDocuments: uploadedDocumentNames.slice(),
@@ -930,6 +1322,9 @@
     }
     if ($("pv-current-number")) {
       $("pv-current-number").textContent = voucher && voucher.voucherNumber ? voucher.voucherNumber : "New draft";
+    }
+    if ($("pv-current-payment-method")) {
+      $("pv-current-payment-method").textContent = voucher ? paymentMethodLabel(voucher.paymentMethod) : "Cash";
     }
     if ($("pv-manage-feedback")) {
       $("pv-manage-feedback").textContent = statusCopy;
@@ -990,6 +1385,40 @@
       "</section>";
   }
 
+  function renderPaymentMethodOptions(selectedValue) {
+    return optionList(getPaymentMethods(), selectedValue || "cash", "Select payment method");
+  }
+
+  function renderReceiptDepartmentOptions(selectedValue) {
+    return optionList(data().departments, selectedValue, "Select department");
+  }
+
+  function renderReceiptCategoryOptions(selectedValue) {
+    return optionList(data().categories, selectedValue, "Select category");
+  }
+
+  function renderReceiptEconomicCodeOptions(categoryId, selectedValue) {
+    var codes = categoryId ? getEconomicCodeOptions(categoryId) : [];
+    return optionList(codes.map(function (item) {
+      return { id: item.id, name: item.code + " - " + item.name };
+    }), selectedValue, categoryId ? "Select economic code" : "Select category first");
+  }
+
+  function receiptDepartmentLabel(departmentId) {
+    var department = byId(data().departments, departmentId);
+    return department ? department.name : "-";
+  }
+
+  function receiptCategoryLabel(categoryId) {
+    var category = byId(data().categories, categoryId);
+    return category ? category.name : "-";
+  }
+
+  function receiptEconomicCodeLabel(itemId) {
+    var item = byId(data().items, itemId);
+    return item ? item.code + " - " + item.name : "-";
+  }
+
   function renderClassificationPreview(voucher) {
     if (!voucher.classifications.length) {
       return '<div class="voucher-empty-state"><strong>No classification captured</strong><span>This voucher does not have any saved entry yet.</span></div>';
@@ -1028,6 +1457,7 @@
       '<div class="voucher-paper-meta">' +
       '<div><span>Voucher Number</span><strong>' + escapeHtml(voucher.voucherNumber || "-") + "</strong></div>" +
       '<div><span>Voucher Date</span><strong>' + escapeHtml(voucher.voucherDate || "-") + "</strong></div>" +
+      '<div><span>Payment Method</span><strong>' + escapeHtml(paymentMethodLabel(voucher.paymentMethod)) + "</strong></div>" +
       '<div><span>Total Amount</span><strong>' + displayAmount(voucher.totalAmount) + "</strong></div>" +
       '<div><span>Entries</span><strong>' + voucher.classifications.length + "</strong></div>" +
       "</div>" +
@@ -1053,14 +1483,734 @@
     }
   }
 
+  function getReceiptPreviewMeta(receipt) {
+    return '' +
+      '<div><span>Treasury No.</span><strong>' + escapeHtml(receipt.treasuryReceiptVoucherNumber || "-") + "</strong></div>" +
+      '<div><span>Receipt No.</span><strong>' + escapeHtml(receipt.receiptNo || "-") + "</strong></div>" +
+      '<div><span>Date</span><strong>' + escapeHtml(receipt.date || "-") + "</strong></div>" +
+      '<div><span>Payment Method</span><strong>' + escapeHtml(paymentMethodLabel(receipt.paymentMethod)) + "</strong></div>" +
+      '<div><span>Department</span><strong>' + escapeHtml(receiptDepartmentLabel(receipt.departmentId)) + "</strong></div>" +
+      '<div><span>Category</span><strong>' + escapeHtml(receiptCategoryLabel(receipt.categoryId)) + "</strong></div>" +
+      '<div><span>Economic Code</span><strong>' + escapeHtml(receiptEconomicCodeLabel(receipt.economicCodeId)) + "</strong></div>" +
+      '<div><span>Amount</span><strong>' + displayAmount(receipt.amount) + "</strong></div>";
+  }
+
+  function renderReceiptPreview(receipt) {
+    var modeLabel = receipt.entryMode === "retireAdvance" ? "Retire Advance" : "Classification";
+    var advanceSection = receipt.entryMode === "retireAdvance"
+      ? '<section class="voucher-paper-section"><h3>Linked Advance</h3><div class="voucher-paper-grid three">' +
+        '<div><span>Reference</span><strong>' + escapeHtml(receipt.advanceReference || "-") + '</strong></div>' +
+        '<div><span>Holder</span><strong>' + escapeHtml(receipt.advanceHolderName || "-") + '</strong></div>' +
+        '<div><span>Balance</span><strong>' + displayAmount(receipt.advanceBalance) + '</strong></div>' +
+        '<div><span>Original Amount</span><strong>' + displayAmount(receipt.advanceOriginalAmount) + '</strong></div>' +
+        '<div><span>Retired So Far</span><strong>' + displayAmount(receipt.advanceRetiredAmount) + '</strong></div>' +
+        '<div><span>Retirement Payment Method</span><strong>' + escapeHtml(paymentMethodLabel(receipt.retirePaymentMethod || receipt.paymentMethod)) + '</strong></div>' +
+        '<div><span>Mode</span><strong>Retire Advance</strong></div>' +
+        "</div></section>"
+      : "";
+
+    return '' +
+      '<article class="voucher-paper">' +
+      '<div class="voucher-paper-head">' +
+      '<div><p class="kicker">Voucher</p><h2>Receipt Voucher</h2><p>' + escapeHtml(receipt.stateName + " / " + receipt.localGovernmentName) + "</p></div>" +
+      '<div class="voucher-paper-status">' + statusPill(receipt.status) + "</div>" +
+      "</div>" +
+      '<div class="voucher-paper-meta">' + getReceiptPreviewMeta(receipt) + '<div><span>Entry Mode</span><strong>' + escapeHtml(modeLabel) + '</strong></div></div>' +
+      advanceSection +
+      '<section class="voucher-paper-section"><h3>Administrative Details</h3><div class="voucher-paper-grid three">' +
+      '<div><span>Department</span><strong>' + escapeHtml(receiptDepartmentLabel(receipt.departmentId)) + "</strong></div>" +
+      '<div><span>Category</span><strong>' + escapeHtml(receiptCategoryLabel(receipt.categoryId)) + "</strong></div>" +
+      '<div><span>Economic Code</span><strong>' + escapeHtml(receiptEconomicCodeLabel(receipt.economicCodeId)) + "</strong></div>" +
+      "</div></section>" +
+      '<section class="voucher-paper-section"><h3>Receipt Details</h3><div class="voucher-paper-grid three">' +
+      '<div><span>Received From</span><strong>' + escapeHtml(receipt.receivedFrom || "-") + "</strong></div>" +
+      '<div><span>Payer Name</span><strong>' + escapeHtml(receipt.payerName || "-") + "</strong></div>" +
+      '<div><span>Witness Name</span><strong>' + escapeHtml(receipt.witnessName || "-") + "</strong></div>" +
+      '<div><span>Cashier / Revenue Collector</span><strong>' + escapeHtml(receipt.cashierName || "-") + "</strong></div>" +
+      '<div><span>Cashier Signature</span><strong>' + escapeHtml(receipt.cashierSignature || "-") + "</strong></div>" +
+      '<div><span>Purpose / On Account Of</span><strong>' + escapeHtml(receipt.purpose || "-") + "</strong></div>" +
+      "</div></section>" +
+      '<section class="voucher-paper-section"><h3>Workflow</h3><div class="voucher-paper-grid three">' +
+      '<div><span>Status</span><strong>' + escapeHtml(receipt.status || "Draft") + "</strong></div>" +
+      '<div><span>Created By</span><strong>' + escapeHtml(receipt.createdBy || "-") + "</strong></div>" +
+      '<div><span>Updated At</span><strong>' + stamp(receipt.updatedAt) + "</strong></div>" +
+      '<div><span>Created At</span><strong>' + stamp(receipt.createdAt) + "</strong></div>" +
+      '<div><span>Routing</span><strong>Checking, then Approval</strong></div>' +
+      '<div><span>Office Copy</span><strong>Treasury record</strong></div>' +
+      "</div></section>" +
+      "</article>";
+  }
+
+  function getAdvanceRetirementTotal(advanceId, excludeReceiptId) {
+    return getReceipts().filter(function (receipt) {
+      return receipt.entryMode === "retireAdvance" && receipt.advanceId === advanceId && receipt.id !== excludeReceiptId;
+    }).reduce(function (sum, receipt) {
+      return sum + Number(receipt.amount || 0);
+    }, 0);
+  }
+
+  function getAdvanceSummary(advanceId, excludeReceiptId) {
+    var advance = byId(getAdvances(), advanceId);
+    var retired = advance ? Number(advance.retiredAmount || 0) : 0;
+    var linked = advance ? getAdvanceRetirementTotal(advanceId, excludeReceiptId) : 0;
+    var original = advance ? Number(advance.originalAmount || 0) : 0;
+    var balance = Math.max(0, original - retired - linked);
+
+    return {
+      advance: advance,
+      original: original,
+      retired: retired + linked,
+      balance: balance
+    };
+  }
+
+  function renderAdvanceOptions(selectedId) {
+    var advances = getAdvances().map(function (advance) {
+      var summary = getAdvanceSummary(advance.id);
+      return {
+        id: advance.id,
+        label: (advance.reference || advance.holderName || advance.id) + " - " + (advance.holderName || "Advance holder") + " - balance " + displayAmount(summary.balance) + (summary.balance > 0 ? "" : " (retired)")
+      };
+    }).filter(function (advance) {
+      return byId(getAdvances(), advance.id) && (getAdvanceSummary(advance.id).balance > 0 || advance.id === selectedId);
+    });
+
+    return optionList(advances, selectedId, "Select running advance");
+  }
+
+  function setReceiptEntryMode(mode) {
+    receiptEntryMode = mode === "retireAdvance" ? "retireAdvance" : "classification";
+
+    document.querySelectorAll("[data-rov-entry-mode]").forEach(function (button) {
+      button.classList.toggle("active", button.getAttribute("data-rov-entry-mode") === receiptEntryMode);
+    });
+
+    if ($("rov-classification-section")) {
+      $("rov-classification-section").hidden = receiptEntryMode === "retireAdvance";
+    }
+    if ($("rov-collection-section")) {
+      $("rov-collection-section").hidden = receiptEntryMode === "retireAdvance";
+    }
+    if ($("rov-narration-section")) {
+      $("rov-narration-section").hidden = receiptEntryMode === "retireAdvance";
+    }
+    if ($("rov-retire-section")) {
+      $("rov-retire-section").hidden = receiptEntryMode !== "retireAdvance";
+    }
+  }
+
+  function populateAdvanceSummary(receipt, excludeReceiptId) {
+    var summary = getAdvanceSummary(receipt.advanceId || selectedAdvanceId, excludeReceiptId || receipt.id);
+    var advance = summary.advance;
+    if (!advance) {
+      if ($("rov-advance-balance")) {
+        $("rov-advance-balance").textContent = "-";
+      }
+      if ($("rov-advance-status")) {
+        $("rov-advance-status").textContent = "Pick an advance to load the carried details.";
+      }
+      ["rov-advance-reference", "rov-advance-holder", "rov-advance-department", "rov-advance-category", "rov-advance-economic-code", "rov-advance-original-amount", "rov-advance-retired-amount", "rov-advance-payment-method"].forEach(function (id) {
+        if ($(id)) {
+          $(id).textContent = "-";
+        }
+      });
+      return summary;
+    }
+
+    if ($("rov-advance-balance")) {
+      $("rov-advance-balance").textContent = displayAmount(summary.balance);
+    }
+    if ($("rov-advance-status")) {
+      $("rov-advance-status").textContent = summary.balance > 0 ? "Part payment is allowed up to the remaining balance." : "This advance is fully retired.";
+    }
+    if ($("rov-advance-reference")) {
+      $("rov-advance-reference").textContent = advance.reference || "-";
+    }
+    if ($("rov-advance-holder")) {
+      $("rov-advance-holder").textContent = advance.holderName || "-";
+    }
+    if ($("rov-advance-department")) {
+      $("rov-advance-department").textContent = receiptDepartmentLabel(advance.departmentId);
+    }
+    if ($("rov-advance-category")) {
+      $("rov-advance-category").textContent = receiptCategoryLabel(advance.categoryId);
+    }
+    if ($("rov-advance-economic-code")) {
+      $("rov-advance-economic-code").textContent = receiptEconomicCodeLabel(advance.economicCodeId);
+    }
+    if ($("rov-advance-original-amount")) {
+      $("rov-advance-original-amount").textContent = displayAmount(summary.original);
+    }
+    if ($("rov-advance-retired-amount")) {
+      $("rov-advance-retired-amount").textContent = displayAmount(summary.retired);
+    }
+    if ($("rov-advance-payment-method")) {
+      $("rov-advance-payment-method").textContent = paymentMethodLabel(advance.paymentMethod);
+    }
+
+    return summary;
+  }
+
+  function applySelectedAdvanceToReceipt(advanceId, existingReceipt) {
+    selectedAdvanceId = advanceId || "";
+    if ($("rov-advance-id")) {
+      $("rov-advance-id").value = selectedAdvanceId;
+    }
+
+    var summary = populateAdvanceSummary({
+      advanceId: selectedAdvanceId,
+      id: existingReceipt && existingReceipt.id ? existingReceipt.id : ""
+    }, existingReceipt && existingReceipt.id);
+    var advance = summary.advance;
+    var keepExistingAmount = Boolean(existingReceipt && existingReceipt.entryMode === "retireAdvance" && existingReceipt.advanceId === selectedAdvanceId);
+
+    if (advance) {
+      setFieldValue("rov-department", advance.departmentId);
+      setFieldValue("rov-category", advance.categoryId);
+      setFieldValue("rov-economic-code", advance.economicCodeId);
+      setFieldValue("rov-retire-payment-method", existingReceipt && existingReceipt.entryMode === "retireAdvance" ? (existingReceipt.retirePaymentMethod || existingReceipt.paymentMethod) : advance.paymentMethod);
+      setFieldValue("rov-retire-received-from", advance.holderName);
+      setFieldValue("rov-retire-payer-name", advance.holderName);
+      setFieldValue("rov-retire-purpose", advance.purpose);
+      setFieldValue("rov-retire-cashier-name", CURRENT_NAME);
+      setFieldValue("rov-retire-witness-name", "");
+      setFieldValue("rov-retire-amount", keepExistingAmount ? digits(existingReceipt.amount) : "");
+    }
+
+    return summary;
+  }
+
+  function setReceiptViewMode(mode) {
+    var detailMode = mode === "detail";
+    if ($("rov-view-panel")) {
+      $("rov-view-panel").classList.toggle("rov-receipt-detail-mode", detailMode);
+      $("rov-view-panel").classList.toggle("rov-receipt-table-mode", !detailMode);
+    }
+  }
+
+  function getReceiptFromForm(existing) {
+    var mode = receiptEntryMode;
+    var advanceId = mode === "retireAdvance" ? getFieldValue("rov-advance-id") : "";
+    var advanceSummary = advanceId ? getAdvanceSummary(advanceId, existing && existing.id ? existing.id : "") : { advance: null, original: 0, retired: 0, balance: 0 };
+    var amountFieldId = mode === "retireAdvance" ? "rov-retire-amount" : "rov-amount";
+    return normalizeReceipt({
+      id: existing && existing.id ? existing.id : "rov-" + slug(getFieldValue("rov-treasury-number") || getFieldValue("rov-receipt-no") || Date.now()),
+      localGovernmentName: LOCAL_GOVERNMENT_NAME,
+      stateName: STATE_NAME,
+      entryMode: mode,
+      advanceId: advanceId,
+      advanceReference: advanceSummary.advance ? advanceSummary.advance.reference : "",
+      advanceHolderName: advanceSummary.advance ? advanceSummary.advance.holderName : "",
+      advanceDepartmentId: advanceSummary.advance ? advanceSummary.advance.departmentId : "",
+      advanceCategoryId: advanceSummary.advance ? advanceSummary.advance.categoryId : "",
+      advanceEconomicCodeId: advanceSummary.advance ? advanceSummary.advance.economicCodeId : "",
+      advancePaymentMethod: advanceSummary.advance ? advanceSummary.advance.paymentMethod : "",
+      advancePurpose: advanceSummary.advance ? advanceSummary.advance.purpose : "",
+      advanceOriginalAmount: advanceSummary.original,
+      advanceRetiredAmount: advanceSummary.retired,
+      advanceBalance: advanceSummary.balance,
+      retirePaymentMethod: mode === "retireAdvance" ? getFieldValue("rov-retire-payment-method") || (advanceSummary.advance ? advanceSummary.advance.paymentMethod : "cash") : "",
+      treasuryReceiptVoucherNumber: getFieldValue("rov-treasury-number"),
+      receiptNo: getFieldValue("rov-receipt-no"),
+      departmentId: getFieldValue("rov-department"),
+      categoryId: getFieldValue("rov-category"),
+      economicCodeId: getFieldValue("rov-economic-code"),
+      paymentMethod: mode === "retireAdvance" ? (getFieldValue("rov-retire-payment-method") || (advanceSummary.advance ? advanceSummary.advance.paymentMethod : "cash")) : getFieldValue("rov-payment-method") || "cash",
+      receivedFrom: mode === "retireAdvance"
+        ? (advanceSummary.advance ? advanceSummary.advance.holderName : getFieldValue("rov-retire-received-from"))
+        : getFieldValue("rov-received-from"),
+      amount: parseMoney(getFieldValue(amountFieldId)),
+      purpose: mode === "retireAdvance"
+        ? (advanceSummary.advance ? advanceSummary.advance.purpose : getFieldValue("rov-retire-purpose"))
+        : getFieldValue("rov-purpose"),
+      cashierSignature: mode === "retireAdvance" ? "" : getFieldValue("rov-cashier-signature"),
+      cashierName: mode === "retireAdvance"
+        ? getFieldValue("rov-retire-cashier-name")
+        : getFieldValue("rov-cashier-name"),
+      date: getFieldValue("rov-date") || new Date().toISOString().slice(0, 10),
+      payerName: mode === "retireAdvance"
+        ? (advanceSummary.advance ? advanceSummary.advance.holderName : getFieldValue("rov-retire-payer-name"))
+        : getFieldValue("rov-payer-name"),
+      witnessName: mode === "retireAdvance"
+        ? getFieldValue("rov-retire-witness-name")
+        : getFieldValue("rov-witness-name"),
+      status: existing ? existing.status : "Draft",
+      createdAt: existing ? existing.createdAt : "",
+      updatedAt: existing ? existing.updatedAt : "",
+      createdBy: existing ? existing.createdBy : ""
+    });
+  }
+
+  function populateReceiptForm(receipt) {
+    if ($("rov-instance-context")) {
+      $("rov-instance-context").textContent = receipt.stateName + " / " + receipt.localGovernmentName;
+    }
+    if ($("rov-overview-instance")) {
+      $("rov-overview-instance").textContent = receipt.stateName + " / " + receipt.localGovernmentName;
+    }
+    if ($("rov-overview-instance-copy")) {
+      $("rov-overview-instance-copy").textContent = "";
+    }
+    setReceiptEntryMode(receipt.entryMode || "classification");
+    selectedAdvanceId = receipt.advanceId || "";
+    if ($("rov-advance-id")) {
+      $("rov-advance-id").innerHTML = renderAdvanceOptions(selectedAdvanceId);
+      $("rov-advance-id").value = selectedAdvanceId;
+    }
+    if (receipt.entryMode === "retireAdvance") {
+      if ($("rov-retire-received-from")) {
+        setFieldValue("rov-retire-received-from", receipt.receivedFrom || receipt.advanceHolderName);
+      }
+      if ($("rov-retire-payer-name")) {
+        setFieldValue("rov-retire-payer-name", receipt.payerName || receipt.advanceHolderName);
+      }
+      if ($("rov-retire-purpose")) {
+        setFieldValue("rov-retire-purpose", receipt.purpose || receipt.advancePurpose);
+      }
+      if ($("rov-retire-payment-method")) {
+        $("rov-retire-payment-method").innerHTML = renderPaymentMethodOptions(receipt.retirePaymentMethod || receipt.paymentMethod || receipt.advancePaymentMethod || "cash");
+        setFieldValue("rov-retire-payment-method", receipt.retirePaymentMethod || receipt.paymentMethod || receipt.advancePaymentMethod || "cash");
+      }
+      if ($("rov-retire-cashier-name")) {
+        setFieldValue("rov-retire-cashier-name", receipt.cashierName);
+      }
+      if ($("rov-retire-witness-name")) {
+        setFieldValue("rov-retire-witness-name", receipt.witnessName);
+      }
+      if ($("rov-retire-amount")) {
+        setFieldValue("rov-retire-amount", receipt.amount ? digits(receipt.amount) : "");
+      }
+      populateAdvanceSummary(receipt, receipt.id);
+    }
+    $("rov-department").innerHTML = renderReceiptDepartmentOptions(receipt.departmentId);
+    $("rov-category").innerHTML = renderReceiptCategoryOptions(receipt.categoryId);
+    $("rov-payment-method").innerHTML = renderPaymentMethodOptions(receipt.paymentMethod || "cash");
+    $("rov-economic-code").innerHTML = renderReceiptEconomicCodeOptions(receipt.categoryId, receipt.economicCodeId);
+    setFieldValue("rov-treasury-number", receipt.treasuryReceiptVoucherNumber);
+    setFieldValue("rov-receipt-no", receipt.receiptNo);
+    setFieldValue("rov-date", receipt.date || new Date().toISOString().slice(0, 10));
+    setFieldValue("rov-department", receipt.departmentId);
+    setFieldValue("rov-category", receipt.categoryId);
+    setFieldValue("rov-economic-code", receipt.economicCodeId);
+    setFieldValue("rov-payment-method", receipt.paymentMethod || "cash");
+    if ($("rov-retire-payment-method")) {
+      $("rov-retire-payment-method").innerHTML = renderPaymentMethodOptions(receipt.retirePaymentMethod || receipt.paymentMethod || receipt.advancePaymentMethod || "cash");
+      setFieldValue("rov-retire-payment-method", receipt.retirePaymentMethod || receipt.paymentMethod || receipt.advancePaymentMethod || "cash");
+    }
+    setFieldValue("rov-received-from", receipt.receivedFrom);
+    setFieldValue("rov-amount", receipt.amount ? digits(receipt.amount) : "");
+    setFieldValue("rov-purpose", receipt.purpose);
+    setFieldValue("rov-cashier-signature", receipt.cashierSignature);
+    setFieldValue("rov-cashier-name", receipt.cashierName);
+    setFieldValue("rov-payer-name", receipt.payerName);
+    setFieldValue("rov-witness-name", receipt.witnessName);
+    updateReceiptSummary(receipt);
+  }
+
+  function updateReceiptSummary(receipt) {
+    var draft = receipt && receipt.treasuryReceiptVoucherNumber !== undefined ? receipt : getReceiptFromForm(receipt || null);
+    if ($("rov-current-status")) {
+      $("rov-current-status").textContent = draft.status || "Draft";
+    }
+    if ($("rov-current-number")) {
+      $("rov-current-number").textContent = draft.treasuryReceiptVoucherNumber || "New receipt";
+    }
+    if ($("rov-current-receipt-no")) {
+      $("rov-current-receipt-no").textContent = draft.receiptNo || "-";
+    }
+    if ($("rov-current-department")) {
+      $("rov-current-department").textContent = receiptDepartmentLabel(draft.departmentId);
+    }
+    if ($("rov-current-category")) {
+      $("rov-current-category").textContent = receiptCategoryLabel(draft.categoryId);
+    }
+    if ($("rov-current-payment-method")) {
+      $("rov-current-payment-method").textContent = paymentMethodLabel(draft.paymentMethod || "cash");
+    }
+    if ($("rov-current-amount")) {
+      $("rov-current-amount").textContent = draft.amount ? digits(draft.amount) : "-";
+    }
+    if ($("rov-current-received-from")) {
+      $("rov-current-received-from").textContent = draft.receivedFrom || "-";
+    }
+  }
+
+  function validateReceipt(receipt) {
+    if (!receipt.treasuryReceiptVoucherNumber) {
+      return "Enter the treasury receipt voucher number.";
+    }
+    if (!receipt.receiptNo) {
+      return "Enter the receipt number.";
+    }
+    if (!receipt.date) {
+      return "Select the receipt date.";
+    }
+    if (receipt.entryMode === "retireAdvance") {
+      var summary = getAdvanceSummary(receipt.advanceId, receipt.id);
+      if (!receipt.advanceId) {
+        return "Select an advance to retire.";
+      }
+      if (!receipt.retirePaymentMethod) {
+        return "Select the payment method for this retirement.";
+      }
+      if (!receipt.amount) {
+        return "Enter the retire amount.";
+      }
+      if (receipt.amount > summary.balance) {
+        return "Retire amount cannot exceed the remaining balance.";
+      }
+      return "";
+    }
+    if (!receipt.departmentId) {
+      return "Select a department.";
+    }
+    if (!receipt.categoryId) {
+      return "Select a category.";
+    }
+    if (!receipt.economicCodeId) {
+      return "Select an economic code.";
+    }
+    if (!receipt.paymentMethod) {
+      return "Select a payment method.";
+    }
+    if (!receipt.receivedFrom) {
+      return "Enter who the receipt was received from.";
+    }
+    if (!receipt.amount) {
+      return "Enter an amount.";
+    }
+    if (!receipt.purpose) {
+      return "Enter the purpose or on-account-of note.";
+    }
+    if (!receipt.cashierName) {
+      return "Enter the cashier or revenue collector name.";
+    }
+    return "";
+  }
+
+  function renderReceiptTable() {
+    var receipts = getReceipts();
+    var selected = byId(receipts, viewReceiptId);
+    var previewId = selected ? selected.id : "";
+
+    registerTableRows("rov-table-body", receipts.map(function (receipt) {
+      return {
+        markup: '<tr class="' + (receipt.id === (selected && selected.id) ? "voucher-selected-row" : "") + '"><td>' + escapeHtml(receipt.treasuryReceiptVoucherNumber || "-") + '</td><td>' + escapeHtml(receipt.receiptNo || "-") + '</td><td>' + escapeHtml(receipt.date || "-") + '</td><td>' + escapeHtml(receiptDepartmentLabel(receipt.departmentId)) + '</td><td>' + escapeHtml(receiptCategoryLabel(receipt.categoryId)) + '</td><td>' + escapeHtml(paymentMethodLabel(receipt.paymentMethod)) + '</td><td>' + escapeHtml(receipt.receivedFrom || "-") + '</td><td>' + digits(receipt.amount) + '</td><td>' + statusPill(receipt.status) + '</td><td><div class="table-inline-actions"><button class="button slim" type="button" data-rov-view="' + escapeHtml(receipt.id) + '">View</button><a class="button slim" href="receipts-voucher.html?edit=' + escapeHtml(receipt.id) + '&tab=manage">Edit</a></div></td></tr>',
+        searchText: [receipt.treasuryReceiptVoucherNumber, receipt.receiptNo, receipt.date, receiptDepartmentLabel(receipt.departmentId), receiptCategoryLabel(receipt.categoryId), paymentMethodLabel(receipt.paymentMethod), receipt.receivedFrom, receipt.payerName, receipt.cashierName, receipt.advanceReference, receipt.entryMode, receipt.status].join(" ")
+      };
+    }), '<tr><td colspan="10">No receipts have been saved yet.</td></tr>', { pageSize: 5, countId: "rov-record-count" });
+
+    document.querySelectorAll("[data-rov-view]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        viewReceiptId = button.getAttribute("data-rov-view");
+        updateReceiptViewPreview(viewReceiptId);
+      });
+    });
+
+    document.querySelectorAll("[data-rov-export]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var exportType = button.getAttribute("data-rov-export");
+        if (exportType === "print") {
+          window.print();
+          return;
+        }
+        toast("Receipt register export to " + exportType.toUpperCase() + " will be enabled in the next pass.", "info");
+      });
+    });
+
+    if (previewId) {
+      updateReceiptViewPreview(previewId);
+    } else {
+      updateReceiptViewPreview("");
+    }
+  }
+
+  function updateReceiptViewPreview(receiptId) {
+    var receipt = byId(getReceipts(), receiptId || viewReceiptId);
+    if (!receipt) {
+      setReceiptViewMode("table");
+      if ($("rov-view-preview")) {
+        $("rov-view-preview").innerHTML = '<div class="voucher-empty-state"><strong>No receipt selected</strong><span>Select a row to inspect the read-only receipt layout.</span></div>';
+      }
+      return;
+    }
+    viewReceiptId = receipt.id;
+    setReceiptViewMode("detail");
+    if ($("rov-view-preview")) {
+      $("rov-view-preview").innerHTML = '<div class="voucher-preview-toolbar"><button class="button slim" type="button" id="rov-back-to-table">Back to table</button></div>' + renderReceiptPreview(receipt);
+      if ($("rov-back-to-table")) {
+        $("rov-back-to-table").addEventListener("click", function () {
+          viewReceiptId = "";
+          setReceiptViewMode("table");
+          if ($("rov-view-preview")) {
+            $("rov-view-preview").innerHTML = '<div class="voucher-empty-state"><strong>No receipt selected</strong><span>Select a row to inspect the read-only receipt layout.</span></div>';
+          }
+        });
+      }
+    }
+  }
+
+  function renderReceiptManage() {
+    var query = new URLSearchParams(window.location.search);
+    var existing = query.get("edit") ? byId(getReceipts(), query.get("edit")) : null;
+    var isEditing = Boolean(existing);
+
+    attachMoneyFormatters(document);
+    populateReceiptForm(existing || normalizeReceipt({ date: new Date().toISOString().slice(0, 10), status: "Draft" }));
+    if ($("rov-manage-feedback")) {
+      $("rov-manage-feedback").textContent = isEditing ? "Editing receipt." : "Draft receipt.";
+    }
+    if ($("rov-status-pill")) {
+      $("rov-status-pill").textContent = existing ? (existing.status || "Draft") : "Draft";
+      $("rov-status-pill").className = "status-pill " + ((existing && existing.status === "Approved") ? "ok" : (existing && existing.status === "Approval") ? "warn" : "info");
+    }
+    if ($("save-rov-draft")) {
+      $("save-rov-draft").textContent = isEditing ? "Update receipt" : "Save receipt";
+    }
+    if ($("submit-rov-approval")) {
+      $("submit-rov-approval").textContent = isEditing ? "Send for Approval" : "Send for Approval";
+    }
+
+    document.querySelectorAll("[data-rov-entry-mode]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var nextMode = button.getAttribute("data-rov-entry-mode");
+        setReceiptEntryMode(nextMode);
+        if (nextMode === "retireAdvance") {
+          applySelectedAdvanceToReceipt($("rov-advance-id") ? $("rov-advance-id").value : selectedAdvanceId, existing);
+        }
+        updateReceiptSummary(getReceiptFromForm(existing));
+      });
+    });
+
+    if ($("rov-advance-id")) {
+      $("rov-advance-id").addEventListener("change", function () {
+        applySelectedAdvanceToReceipt($("rov-advance-id").value, existing);
+        updateReceiptSummary(getReceiptFromForm(existing));
+      });
+    }
+
+    ["rov-treasury-number", "rov-receipt-no", "rov-date", "rov-department", "rov-economic-code", "rov-payment-method", "rov-received-from", "rov-amount", "rov-purpose", "rov-cashier-signature", "rov-cashier-name", "rov-payer-name", "rov-witness-name", "rov-retire-payment-method", "rov-retire-received-from", "rov-retire-payer-name", "rov-retire-amount", "rov-retire-purpose", "rov-retire-cashier-name", "rov-retire-witness-name"].forEach(function (id) {
+      if ($(id)) {
+        $(id).addEventListener("input", function () {
+          updateReceiptSummary(getReceiptFromForm(existing));
+        });
+        $(id).addEventListener("change", function () {
+          updateReceiptSummary(getReceiptFromForm(existing));
+        });
+      }
+    });
+
+    if ($("rov-category")) {
+      $("rov-category").addEventListener("change", function () {
+        $("rov-economic-code").innerHTML = renderReceiptEconomicCodeOptions($("rov-category").value, $("rov-economic-code").value);
+        updateReceiptSummary(getReceiptFromForm(existing));
+      });
+    }
+
+    function persistReceipt(nextStatus, successMessage, nextHref) {
+      var allReceipts = getReceipts();
+      var receipt = getReceiptFromForm(existing);
+      var index = allReceipts.findIndex(function (entry) { return entry.id === receipt.id; });
+      var validationMessage = validateReceipt(receipt);
+
+      if (validationMessage) {
+        feedback("rov-manage-feedback", validationMessage, "error");
+        return;
+      }
+
+      receipt.status = nextStatus || receipt.status || "Draft";
+      receipt.createdAt = existing ? existing.createdAt : new Date().toISOString();
+      receipt.updatedAt = new Date().toISOString();
+      receipt.createdBy = existing ? existing.createdBy : CURRENT_NAME;
+
+      if (index > -1) {
+        allReceipts[index] = receipt;
+        logVoucherChange("Receipts (RV)", "Updated receipt voucher " + (receipt.treasuryReceiptVoucherNumber || "without number") + ".");
+      } else {
+        allReceipts.unshift(receipt);
+        logVoucherChange("Receipts (RV)", "Created receipt voucher " + (receipt.treasuryReceiptVoucherNumber || "without number") + ".");
+      }
+
+      write(STORE.receipts, allReceipts);
+      viewReceiptId = receipt.id;
+      updateReceiptViewPreview(receipt.id);
+      feedback("rov-manage-feedback", successMessage, "success");
+      if (nextHref) {
+        window.location.href = nextHref.replace("{id}", receipt.id);
+      }
+    }
+
+    if ($("save-rov-draft")) {
+      $("save-rov-draft").addEventListener("click", function () {
+        persistReceipt(existing ? existing.status || "Draft" : "Draft", "Receipt saved successfully.", "receipts-voucher.html?tab=view&view={id}");
+      });
+    }
+
+    if ($("submit-rov-approval")) {
+      $("submit-rov-approval").addEventListener("click", function () {
+        persistReceipt("Approval", "Receipt sent for approval.", "receipt-approval.html?tab=pending&receipt={id}");
+      });
+    }
+  }
+
+  function renderReceiptsPage() {
+    var query = new URLSearchParams(window.location.search);
+    var initialTarget = query.get("tab") === "manage" ? "rov-manage-panel" : "rov-view-panel";
+    var selectedReceiptId = query.get("view") || query.get("edit") || "";
+
+    if (query.get("edit") && query.get("tab") !== "view") {
+      initialTarget = "rov-manage-panel";
+    }
+
+    viewReceiptId = selectedReceiptId;
+    initModuleTabs(initialTarget);
+    renderReceiptManage();
+    renderReceiptTable();
+    updateReceiptViewPreview(viewReceiptId);
+  }
+
+  function getReceiptApprovalReceipts() {
+    return getReceipts().filter(function (receipt) {
+      return receipt.status === "Approval" || receipt.status === "Approved" || receipt.status === "Rejected";
+    });
+  }
+
+  function renderReceiptApprovalPreview(receipt) {
+    return renderReceiptPreview(receipt);
+  }
+
+  function setReceiptApprovalActionState(receipt) {
+    var isPending = receipt && receipt.status === "Approval";
+    var isApproved = receipt && receipt.status === "Approved";
+    var isRejected = receipt && receipt.status === "Rejected";
+
+    if ($("accept-receipt-approval-btn")) {
+      $("accept-receipt-approval-btn").style.display = isPending ? "inline-flex" : "none";
+      $("accept-receipt-approval-btn").disabled = !isPending;
+    }
+    if ($("reject-receipt-approval-btn")) {
+      $("reject-receipt-approval-btn").style.display = isPending ? "inline-flex" : "none";
+      $("reject-receipt-approval-btn").disabled = !isPending;
+    }
+    if ($("receipt-approval-feedback")) {
+      if (!receipt) {
+        $("receipt-approval-feedback").textContent = "No receipt selected.";
+      } else if (isPending) {
+        $("receipt-approval-feedback").textContent = "Review " + receipt.treasuryReceiptVoucherNumber + " and approve it or return it to draft.";
+      } else if (isApproved) {
+        $("receipt-approval-feedback").textContent = receipt.treasuryReceiptVoucherNumber + " has already been approved.";
+      } else if (isRejected) {
+        $("receipt-approval-feedback").textContent = receipt.treasuryReceiptVoucherNumber + " was rejected and returned.";
+      }
+    }
+    if ($("receipt-approval-detail-status")) {
+      $("receipt-approval-detail-status").className = "status-pill " + (isPending ? "warn" : isApproved ? "ok" : isRejected ? "danger" : "info");
+      $("receipt-approval-detail-status").textContent = isPending ? "Pending approval" : isApproved ? "Approved" : isRejected ? "Rejected" : "Review mode";
+    }
+    if ($("receipt-approval-detail-copy")) {
+      $("receipt-approval-detail-copy").textContent = receipt
+        ? "Inspect the receipt details, then approve it or return it to draft."
+        : "Inspect the selected receipt, then use the back button to return to the queue.";
+    }
+  }
+
+  function renderReceiptApprovalTable() {
+    var receipts = getReceiptApprovalReceipts();
+    var selected = byId(receipts, receiptApprovalId) || receipts[0];
+
+    registerTableRows("receipt-approval-body", receipts.map(function (receipt) {
+      return {
+        markup: '<tr class="' + (receipt.id === (selected && selected.id) ? "voucher-selected-row" : "") + '"><td>' + escapeHtml(receipt.treasuryReceiptVoucherNumber || "-") + '</td><td>' + escapeHtml(receipt.receiptNo || "-") + '</td><td>' + escapeHtml(receipt.date || "-") + '</td><td>' + escapeHtml(receiptDepartmentLabel(receipt.departmentId)) + '</td><td>' + escapeHtml(receiptCategoryLabel(receipt.categoryId)) + '</td><td>' + escapeHtml(paymentMethodLabel(receipt.paymentMethod)) + '</td><td>' + digits(receipt.amount) + '</td><td>' + statusPill(receipt.status) + '</td><td>' + escapeHtml(receipt.createdBy || "-") + '</td><td><button class="button slim" type="button" data-receipt-approval-review="' + escapeHtml(receipt.id) + '">Review</button></td></tr>',
+        searchText: [receipt.treasuryReceiptVoucherNumber, receipt.receiptNo, receipt.date, receiptDepartmentLabel(receipt.departmentId), receiptCategoryLabel(receipt.categoryId), paymentMethodLabel(receipt.paymentMethod), receipt.createdBy, receipt.status].join(" ")
+      };
+    }), '<tr><td colspan="10">No receipts are waiting for approval.</td></tr>', { pageSize: 5, countId: "receipt-approval-count" });
+
+    document.querySelectorAll("[data-receipt-approval-review]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        receiptApprovalId = button.getAttribute("data-receipt-approval-review");
+        updateReceiptApprovalDetail(receiptApprovalId);
+      });
+    });
+
+    if (!receiptApprovalId && receipts.length) {
+      updateReceiptApprovalDetail(receipts[0].id);
+    } else {
+      updateReceiptApprovalDetail(receiptApprovalId);
+    }
+  }
+
+  function updateReceiptApprovalDetail(receiptId) {
+    var receipt = byId(getReceiptApprovalReceipts(), receiptId || receiptApprovalId);
+    if (!receipt) {
+      if ($("receipt-approval-preview")) {
+        $("receipt-approval-preview").innerHTML = '<div class="voucher-empty-state"><strong>No receipt selected</strong><span>Select a receipt row to inspect it.</span></div>';
+      }
+      setReceiptApprovalActionState(null);
+      return;
+    }
+    receiptApprovalId = receipt.id;
+    if ($("receipt-approval-preview")) {
+      $("receipt-approval-preview").innerHTML = renderReceiptApprovalPreview(receipt);
+    }
+    setReceiptApprovalActionState(receipt);
+  }
+
+  function renderReceiptApprovalPage() {
+    var query = new URLSearchParams(window.location.search);
+    receiptApprovalId = query.get("receipt") || "";
+
+    if ($("receipt-approval-back")) {
+      $("receipt-approval-back").addEventListener("click", function () {
+        receiptApprovalId = "";
+        renderReceiptApprovalTable();
+      });
+    }
+
+    if ($("accept-receipt-approval-btn")) {
+      $("accept-receipt-approval-btn").addEventListener("click", function () {
+        var receipts = getReceipts();
+        var receipt = byId(receipts, receiptApprovalId);
+        if (!receipt) {
+          feedback("receipt-approval-feedback", "Select a receipt first.", "error");
+          return;
+        }
+        receipt.status = "Approved";
+        receipt.updatedAt = new Date().toISOString();
+        write(STORE.receipts, receipts);
+        logVoucherChange("Receipts (RV)", "Approved receipt voucher " + receipt.treasuryReceiptVoucherNumber + ".");
+        feedback("receipt-approval-feedback", receipt.treasuryReceiptVoucherNumber + " approved.", "success");
+        window.location.href = "receipts-voucher.html?tab=view&view=" + receipt.id;
+      });
+    }
+
+    if ($("reject-receipt-approval-btn")) {
+      $("reject-receipt-approval-btn").addEventListener("click", function () {
+        var receipts = getReceipts();
+        var receipt = byId(receipts, receiptApprovalId);
+        if (!receipt) {
+          feedback("receipt-approval-feedback", "Select a receipt first.", "error");
+          return;
+        }
+        receipt.status = "Draft";
+        receipt.updatedAt = new Date().toISOString();
+        write(STORE.receipts, receipts);
+        logVoucherChange("Receipts (RV)", "Returned receipt voucher " + receipt.treasuryReceiptVoucherNumber + " to draft.");
+        feedback("receipt-approval-feedback", receipt.treasuryReceiptVoucherNumber + " returned to draft.", "success");
+        window.location.href = "receipts-voucher.html?tab=manage&edit=" + receipt.id;
+      });
+    }
+
+    renderReceiptApprovalTable();
+  }
+
   function renderPaymentVoucherTable() {
     var vouchers = getVouchers();
     registerTableRows("pv-table-body", vouchers.map(function (voucher) {
       return {
-        markup: '<tr><td>' + escapeHtml(voucher.voucherNumber || "-") + '</td><td>' + escapeHtml(voucher.voucherDate || "-") + '</td><td>' + escapeHtml((voucher.payToEntries[0] || {}).name || "-") + '</td><td>' + voucher.classifications.length + '</td><td>' + digits(voucher.totalAmount) + '</td><td>' + statusPill(voucher.status) + '</td><td><div class="table-inline-actions"><button class="button slim" type="button" data-pv-view="' + escapeHtml(voucher.id) + '">View</button><a class="button slim" href="payments-voucher.html?edit=' + escapeHtml(voucher.id) + '&tab=manage">Open</a></div></td></tr>',
-        searchText: [voucher.voucherNumber, voucher.voucherDate, (voucher.payToEntries[0] || {}).name || "", voucher.status].join(" ")
+        markup: '<tr><td>' + escapeHtml(voucher.voucherNumber || "-") + '</td><td>' + escapeHtml(voucher.voucherDate || "-") + '</td><td>' + escapeHtml(paymentMethodLabel(voucher.paymentMethod)) + '</td><td>' + escapeHtml((voucher.payToEntries[0] || {}).name || "-") + '</td><td>' + voucher.classifications.length + '</td><td>' + digits(voucher.totalAmount) + '</td><td>' + statusPill(voucher.status) + '</td><td><div class="table-inline-actions"><button class="button slim" type="button" data-pv-view="' + escapeHtml(voucher.id) + '">View</button><a class="button slim" href="payments-voucher.html?edit=' + escapeHtml(voucher.id) + '&tab=manage">Open</a></div></td></tr>',
+        searchText: [voucher.voucherNumber, voucher.voucherDate, paymentMethodLabel(voucher.paymentMethod), (voucher.payToEntries[0] || {}).name || "", voucher.status].join(" ")
       };
-    }), '<tr><td colspan="7">No payment vouchers saved yet.</td></tr>', { pageSize: 5, countId: "pv-record-count" });
+    }), '<tr><td colspan="8">No payment vouchers saved yet.</td></tr>', { pageSize: 5, countId: "pv-record-count" });
 
     document.querySelectorAll("[data-pv-view]").forEach(function (button) {
       button.addEventListener("click", function () {
@@ -1103,6 +2253,10 @@
       $("add-pv-payto").addEventListener("click", function () {
         addPayToRow();
       });
+    }
+    if ($("pv-payment-method")) {
+      $("pv-payment-method").innerHTML = renderPaymentMethodOptions(existing ? existing.paymentMethod : "cash");
+      setFieldValue("pv-payment-method", existing ? (existing.paymentMethod || "cash") : "cash");
     }
     document.querySelectorAll("[data-entry-mode]").forEach(function (button) {
       button.addEventListener("click", function () {
@@ -1232,82 +2386,431 @@
     return voucher;
   }
 
+  function getCheckingTabStatuses(tab) {
+    if (tab === "checked") {
+      return ["Checked"];
+    }
+    if (tab === "rejected") {
+      return ["Rejected"];
+    }
+    return ["Checking"];
+  }
+
+  function getCheckingTabLabel(tab) {
+    if (tab === "checked") {
+      return "Checked Vouchers";
+    }
+    if (tab === "rejected") {
+      return "Rejected Vouchers";
+    }
+    return "Pending Checks";
+  }
+
+  function getCheckingTabCopy(tab) {
+    if (tab === "checked") {
+      return "Checked vouchers are read-only until they are submitted for passing.";
+    }
+    if (tab === "rejected") {
+      return "Rejected vouchers are read-only until they are resubmitted to pending checks.";
+    }
+    return "Only vouchers in the pending checks state appear here for review.";
+  }
+
+  function getCheckingSelection(tab) {
+    return checkingPageState.selected[tab] || "";
+  }
+
+  function setCheckingSelection(tab, voucherId) {
+    checkingPageState.selected[tab] = voucherId || "";
+  }
+
+  function setCheckingView(view, voucherId) {
+    checkingPageState.view = view === "detail" ? "detail" : "table";
+    checkingPageState.detailVoucherId = checkingPageState.view === "detail" ? (voucherId || "") : "";
+  }
+
+  function getCheckingFilteredVouchers(tab) {
+    var statuses = getCheckingTabStatuses(tab);
+    var filterDate = checkingPageState.date;
+    return getVouchers().filter(function (voucher) {
+      return statuses.indexOf(voucher.status) !== -1 && (!filterDate || voucher.voucherDate === filterDate);
+    });
+  }
+
+  function setCheckingActionState(tab, voucher) {
+    var selectedStatus = voucher ? voucher.status : "";
+    var isPending = selectedStatus === "Checking";
+    var isChecked = selectedStatus === "Checked";
+    var isRejected = selectedStatus === "Rejected";
+
+    if ($("reject-checking-btn")) {
+      $("reject-checking-btn").style.display = isPending ? "inline-flex" : "none";
+      $("reject-checking-btn").disabled = !isPending;
+    }
+    if ($("accept-checking-btn")) {
+      $("accept-checking-btn").style.display = isPending ? "inline-flex" : "none";
+      $("accept-checking-btn").disabled = !isPending;
+    }
+    if ($("resubmit-checking-btn")) {
+      $("resubmit-checking-btn").style.display = isRejected ? "inline-flex" : "none";
+      $("resubmit-checking-btn").disabled = !isRejected;
+    }
+
+    if ($("pv-checking-note")) {
+      $("pv-checking-note").disabled = !isPending;
+      if (!isPending) {
+        $("pv-checking-note").value = "";
+      }
+    }
+
+    if ($("pv-checking-feedback")) {
+      if (!voucher) {
+        $("pv-checking-feedback").textContent = "No voucher selected.";
+      } else if (isPending) {
+        $("pv-checking-feedback").textContent = "Reviewing " + voucher.voucherNumber + " in pending checks. Payment method: " + paymentMethodLabel(voucher.paymentMethod) + ".";
+      } else if (isChecked) {
+        $("pv-checking-feedback").textContent = "Viewing checked voucher " + voucher.voucherNumber + ". Payment method: " + paymentMethodLabel(voucher.paymentMethod) + ".";
+      } else if (isRejected) {
+        $("pv-checking-feedback").textContent = "Viewing rejected voucher " + voucher.voucherNumber + ". Payment method: " + paymentMethodLabel(voucher.paymentMethod) + ".";
+      }
+    }
+
+    if ($("pv-checking-detail-status")) {
+      $("pv-checking-detail-status").className = "status-pill " + (isPending ? "warn" : isChecked ? "ok" : isRejected ? "danger" : "info");
+      $("pv-checking-detail-status").textContent = isPending ? "Pending checks" : isChecked ? "Checked" : isRejected ? "Rejected" : "Review mode";
+    }
+    if ($("pv-checking-detail-title")) {
+      $("pv-checking-detail-title").textContent = voucher ? "Review " + (voucher.voucherNumber || "voucher") : "Review voucher";
+    }
+    if ($("pv-checking-detail-copy")) {
+      if (!voucher) {
+        $("pv-checking-detail-copy").textContent = "Inspect the selected voucher, then use the back button to return to the queue.";
+      } else if (isPending) {
+        $("pv-checking-detail-copy").textContent = "This voucher is awaiting checking. Payment method: " + paymentMethodLabel(voucher.paymentMethod) + ". You can approve it or return it to draft.";
+      } else if (isChecked) {
+        $("pv-checking-detail-copy").textContent = "This voucher is already checked and has moved forward for passing. Payment method: " + paymentMethodLabel(voucher.paymentMethod) + ".";
+      } else if (isRejected) {
+        $("pv-checking-detail-copy").textContent = "This voucher was rejected. Payment method: " + paymentMethodLabel(voucher.paymentMethod) + ". Review the note before resubmitting it.";
+      }
+    }
+    if ($("pv-checking-actions-shell")) {
+      $("pv-checking-actions-shell").hidden = !voucher || isChecked;
+    }
+    if ($("pv-checking-detail-layout")) {
+      $("pv-checking-detail-layout").classList.toggle("is-readonly", !voucher || isChecked);
+    }
+  }
+
+  function renderCheckingDetail(tab) {
+    var selectedId = checkingPageState.detailVoucherId || getCheckingSelection(tab);
+    var vouchers = getCheckingFilteredVouchers(tab);
+    var selected = byId(vouchers, selectedId) || vouchers[0];
+
+    if (!selected) {
+      if ($("pv-checking-preview")) {
+        $("pv-checking-preview").innerHTML = '<div class="voucher-empty-state"><strong>No voucher in ' + escapeHtml(getCheckingTabLabel(tab)) + '</strong><span>Matching vouchers will appear here for review.</span></div>';
+      }
+      setCheckingActionState(tab, null);
+      return;
+    }
+
+    setCheckingSelection(tab, selected.id);
+    setCheckingView("detail", selected.id);
+    if ($("pv-checking-preview")) {
+      $("pv-checking-preview").innerHTML = renderVoucherPreview(selected);
+    }
+    setCheckingActionState(tab, selected);
+  }
+
+  function renderCheckingTable(tab) {
+    var vouchers = getCheckingFilteredVouchers(tab);
+    var selectedId = getCheckingSelection(tab);
+    var selected = byId(vouchers, selectedId) || vouchers[0];
+
+    registerTableRows("pv-checking-body", vouchers.map(function (voucher) {
+      return {
+        markup: '<tr class="' + (voucher.id === (selected && selected.id) ? "voucher-selected-row" : "") + '"><td>' + escapeHtml(voucher.voucherNumber || "-") + '</td><td>' + escapeHtml(voucher.voucherDate || "-") + '</td><td>' + escapeHtml(paymentMethodLabel(voucher.paymentMethod)) + '</td><td>' + escapeHtml((voucher.payToEntries[0] || {}).name || "-") + '</td><td>' + voucher.classifications.length + '</td><td>' + digits(voucher.totalAmount) + '</td><td>' + statusPill(voucher.status) + '</td><td>' + escapeHtml(voucher.createdBy || "-") + '</td><td><button class="button slim" type="button" data-checking-review="' + escapeHtml(voucher.id) + '">Review</button></td></tr>',
+        searchText: [voucher.voucherNumber, voucher.voucherDate, paymentMethodLabel(voucher.paymentMethod), (voucher.payToEntries[0] || {}).name || "", voucher.createdBy, voucher.status].join(" ")
+      };
+    }), '<tr><td colspan="9">No vouchers in this tab for the selected date.</td></tr>', { pageSize: 5, countId: "pv-checking-count" });
+
+    document.querySelectorAll("[data-checking-review]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        setCheckingSelection(tab, button.getAttribute("data-checking-review"));
+        setCheckingView("detail", button.getAttribute("data-checking-review"));
+        checkingRefreshPage();
+      });
+    });
+  }
+
   function renderCheckingPage() {
     var query = new URLSearchParams(window.location.search);
-    checkingVoucherId = query.get("voucher") || "";
-    var config = {
-      status: "Checking",
-      bodyId: "pv-checking-body",
-      countId: "pv-checking-count",
-      previewId: "pv-checking-preview",
-      feedbackId: "pv-checking-feedback",
-      primaryButtonId: "submit-pv-passing-btn",
-      rejectButtonId: "reject-checking-btn",
-      selectedGetter: function () { return checkingVoucherId; },
-      selectedSetter: function (value) { checkingVoucherId = value; },
-      reviewCopy: "Reviewing {voucher} for checking action.",
-      emptyCopy: "No voucher awaiting checking."
-    };
-    renderWorkflowQueue(config);
+    var initialVoucher = query.get("voucher") || "";
+    var initialTab = query.get("tab") || "pending";
+    var initialRecord = initialVoucher ? byId(getVouchers(), initialVoucher) : null;
 
-    $("submit-pv-passing-btn").addEventListener("click", function () {
-      var vouchers = getVouchers();
-      var voucher = byId(vouchers, checkingVoucherId);
-      if (!voucher) {
-        feedback("pv-checking-feedback", "Select a voucher first.", "error");
-        return;
+    checkingPageState.tab = ["pending", "checked", "rejected"].indexOf(initialTab) !== -1 ? initialTab : "pending";
+    if (initialRecord) {
+      if (initialRecord.status === "Checked") {
+        checkingPageState.tab = "checked";
+      } else if (initialRecord.status === "Rejected") {
+        checkingPageState.tab = "rejected";
+      } else if (initialRecord.status === "Checking") {
+        checkingPageState.tab = "pending";
       }
-      voucher.status = "Passing";
-      voucher.checkedAt = new Date().toISOString();
-      voucher.checkedByWorkflow = CURRENT_NAME;
-      voucher.rejectionNote = "";
-      write(STORE.vouchers, vouchers);
-      logVoucherChange("Checking", "Submitted payment voucher " + voucher.voucherNumber + " for passing.");
-      feedback("pv-checking-feedback", voucher.voucherNumber + " moved to passing.", "success");
-      checkingVoucherId = "";
-      $("pv-checking-note").value = "";
-      renderWorkflowQueue(config);
+    }
+    checkingPageState.selected[checkingPageState.tab] = initialVoucher;
+    setCheckingView(initialRecord ? "detail" : "table", initialRecord ? initialVoucher : "");
+
+    function refreshCheckingPage() {
+      var tab = checkingPageState.tab;
+      var selected = byId(getCheckingFilteredVouchers(tab), getCheckingSelection(tab)) || null;
+      var tableShell = $("pv-checking-table-shell");
+      var detailShell = $("pv-checking-detail-shell");
+      document.querySelectorAll("[data-checking-tab]").forEach(function (button) {
+        button.classList.toggle("active", button.getAttribute("data-checking-tab") === tab);
+      });
+      if ($("pv-checking-copy")) {
+        $("pv-checking-copy").textContent = getCheckingTabCopy(tab);
+      }
+      if (tableShell) {
+        tableShell.hidden = checkingPageState.view === "detail";
+        tableShell.classList.toggle("table-view-layout", checkingPageState.view !== "detail");
+      }
+      if (detailShell) {
+        detailShell.hidden = checkingPageState.view !== "detail";
+      }
+      if (checkingPageState.view === "detail") {
+        renderCheckingDetail(tab);
+      } else {
+        renderCheckingTable(tab);
+        setCheckingActionState(tab, selected);
+      }
+    }
+    checkingRefreshPage = refreshCheckingPage;
+
+    document.querySelectorAll("[data-checking-tab]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        checkingPageState.tab = button.getAttribute("data-checking-tab");
+        setCheckingView("table", "");
+        refreshCheckingPage();
+      });
     });
 
-    $("reject-checking-btn").addEventListener("click", function () {
-      var note = getFieldValue("pv-checking-note");
-      if (!note) {
-        feedback("pv-checking-feedback", "Enter a rejection note before returning the voucher to draft.", "error");
-        return;
+    if ($("pv-checking-back")) {
+      $("pv-checking-back").addEventListener("click", function () {
+        setCheckingView("table", "");
+        refreshCheckingPage();
+      });
+    }
+
+    if ($("pv-checking-date-filter")) {
+      $("pv-checking-date-filter").value = checkingPageState.date;
+      $("pv-checking-date-filter").addEventListener("change", function () {
+        checkingPageState.date = $("pv-checking-date-filter").value;
+        refreshCheckingPage();
+      });
+    }
+
+    if ($("pv-checking-clear-filter")) {
+      $("pv-checking-clear-filter").addEventListener("click", function () {
+        checkingPageState.date = "";
+        $("pv-checking-date-filter").value = "";
+        refreshCheckingPage();
+      });
+    }
+
+    if ($("accept-checking-btn")) {
+      $("accept-checking-btn").addEventListener("click", function () {
+        var vouchers = getVouchers();
+        var voucher = byId(vouchers, checkingPageState.detailVoucherId || getCheckingSelection("pending"));
+        if (!voucher) {
+          feedback("pv-checking-feedback", "Select a pending voucher first.", "error");
+          return;
+        }
+
+        voucher.status = "Checked";
+        voucher.checkedAt = new Date().toISOString();
+        voucher.checkedByWorkflow = CURRENT_NAME;
+        voucher.rejectionNote = "";
+        write(STORE.vouchers, vouchers);
+        logVoucherChange("Checking", "Accepted and checked payment voucher " + voucher.voucherNumber + ".");
+        checkingPageState.selected.checked = voucher.id;
+        checkingPageState.selected.pending = "";
+        checkingPageState.tab = "checked";
+        setCheckingView("table", "");
+        refreshCheckingPage();
+      });
+    }
+
+    if ($("reject-checking-btn")) {
+      $("reject-checking-btn").addEventListener("click", function () {
+        var note = getFieldValue("pv-checking-note");
+        if (!note) {
+          feedback("pv-checking-feedback", "Enter a rejection note before rejecting the voucher.", "error");
+          return;
+        }
+        var vouchers = getVouchers();
+        var voucher = byId(vouchers, checkingPageState.detailVoucherId || getCheckingSelection("pending"));
+        if (!voucher) {
+          feedback("pv-checking-feedback", "Select a pending voucher first.", "error");
+          return;
+        }
+        voucher.status = "Rejected";
+        voucher.rejectedAt = new Date().toISOString();
+        voucher.rejectionNote = note;
+        voucher.checkedAt = "";
+        voucher.checkedByWorkflow = "";
+        voucher.passedAt = "";
+        voucher.passedByWorkflow = "";
+        write(STORE.vouchers, vouchers);
+        logVoucherChange("Checking", "Rejected payment voucher " + voucher.voucherNumber + " with note.");
+        checkingPageState.selected.rejected = voucher.id;
+        checkingPageState.selected.pending = "";
+        checkingPageState.tab = "rejected";
+        $("pv-checking-note").value = "";
+        setCheckingView("table", "");
+        refreshCheckingPage();
+      });
+    }
+
+    if ($("resubmit-checking-btn")) {
+      $("resubmit-checking-btn").addEventListener("click", function () {
+        var vouchers = getVouchers();
+        var voucher = byId(vouchers, checkingPageState.detailVoucherId || getCheckingSelection("rejected"));
+        if (!voucher) {
+          feedback("pv-checking-feedback", "Select a rejected voucher first.", "error");
+          return;
+        }
+        voucher.status = "Checking";
+        voucher.rejectedAt = "";
+        voucher.rejectionNote = "";
+        write(STORE.vouchers, vouchers);
+        logVoucherChange("Checking", "Resubmitted rejected voucher " + voucher.voucherNumber + " back to pending checks.");
+        checkingPageState.selected.pending = voucher.id;
+        checkingPageState.selected.rejected = "";
+        checkingPageState.tab = "pending";
+        setCheckingView("table", "");
+        refreshCheckingPage();
+      });
+    }
+
+    refreshCheckingPage();
+  }
+
+  function setPassingView(view, voucherId) {
+    passingPageState.view = view === "detail" ? "detail" : "table";
+    passingPageState.detailVoucherId = passingPageState.view === "detail" ? (voucherId || "") : "";
+    passingVoucherId = passingPageState.detailVoucherId;
+  }
+
+  function setPassingActionState(voucher) {
+    var isPassing = voucher && voucher.status === "Passing";
+
+    if ($("mark-pv-passed-btn")) {
+      $("mark-pv-passed-btn").disabled = !isPassing;
+    }
+    if ($("reject-passing-btn")) {
+      $("reject-passing-btn").disabled = !isPassing;
+    }
+    if ($("pv-passing-note")) {
+      $("pv-passing-note").disabled = !isPassing;
+      if (!isPassing) {
+        $("pv-passing-note").value = "";
       }
-      var voucher = rejectVoucherToDraft(checkingVoucherId, note, "Checking");
+    }
+    if ($("pv-passing-feedback")) {
       if (!voucher) {
-        feedback("pv-checking-feedback", "Select a voucher first.", "error");
-        return;
+        $("pv-passing-feedback").textContent = "No voucher selected.";
+      } else {
+        $("pv-passing-feedback").textContent = "Reviewing " + voucher.voucherNumber + " for passing action. Payment method: " + paymentMethodLabel(voucher.paymentMethod) + ".";
       }
-      feedback("pv-checking-feedback", voucher.voucherNumber + " returned to draft.", "success");
-      checkingVoucherId = "";
-      $("pv-checking-note").value = "";
-      renderWorkflowQueue(config);
+    }
+    if ($("pv-passing-detail-status")) {
+      $("pv-passing-detail-status").className = "status-pill " + (isPassing ? "warn" : "info");
+      $("pv-passing-detail-status").textContent = isPassing ? "Passing queue" : "Review mode";
+    }
+    if ($("pv-passing-detail-title")) {
+      $("pv-passing-detail-title").textContent = voucher ? "Review " + (voucher.voucherNumber || "voucher") : "Review voucher";
+    }
+    if ($("pv-passing-detail-copy")) {
+      $("pv-passing-detail-copy").textContent = voucher
+        ? "Inspect the voucher, then mark it as passed or return it to draft. Payment method: " + paymentMethodLabel(voucher.paymentMethod) + "."
+        : "Inspect the selected voucher, then use the back button to return to the queue.";
+    }
+  }
+
+  function renderPassingDetail() {
+    var vouchers = getVouchers().filter(function (voucher) { return voucher.status === "Passing"; });
+    var selected = byId(vouchers, passingPageState.detailVoucherId || passingVoucherId) || vouchers[0];
+
+    if (!selected) {
+      if ($("pv-passing-preview")) {
+        $("pv-passing-preview").innerHTML = '<div class="voucher-empty-state"><strong>No voucher in Passing queue</strong><span>Matching vouchers will appear here for review.</span></div>';
+      }
+      setPassingActionState(null);
+      return;
+    }
+
+    setPassingView("detail", selected.id);
+    if ($("pv-passing-preview")) {
+      $("pv-passing-preview").innerHTML = renderVoucherPreview(selected);
+    }
+    setPassingActionState(selected);
+  }
+
+  function renderPassingTable() {
+    var vouchers = getVouchers().filter(function (voucher) { return voucher.status === "Passing"; });
+    var selected = byId(vouchers, passingPageState.detailVoucherId || passingVoucherId) || vouchers[0];
+
+    registerTableRows("pv-passing-body", vouchers.map(function (voucher) {
+      return {
+        markup: '<tr class="' + (voucher.id === (selected && selected.id) ? "voucher-selected-row" : "") + '"><td>' + escapeHtml(voucher.voucherNumber || "-") + '</td><td>' + escapeHtml(voucher.voucherDate || "-") + '</td><td>' + escapeHtml(paymentMethodLabel(voucher.paymentMethod)) + '</td><td>' + escapeHtml((voucher.payToEntries[0] || {}).name || "-") + '</td><td>' + voucher.classifications.length + '</td><td>' + digits(voucher.totalAmount) + '</td><td>' + statusPill(voucher.status) + '</td><td>' + escapeHtml(voucher.createdBy || "-") + '</td><td><button class="button slim" type="button" data-passing-review="' + escapeHtml(voucher.id) + '">Review</button></td></tr>',
+        searchText: [voucher.voucherNumber, voucher.voucherDate, paymentMethodLabel(voucher.paymentMethod), (voucher.payToEntries[0] || {}).name || "", voucher.createdBy].join(" ")
+      };
+    }), '<tr><td colspan="9">No vouchers in this queue.</td></tr>', { pageSize: 5, countId: "pv-passing-count" });
+
+    document.querySelectorAll("[data-passing-review]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        setPassingView("detail", button.getAttribute("data-passing-review"));
+        passingRefreshPage();
+      });
     });
   }
 
   function renderPassingPage() {
     var query = new URLSearchParams(window.location.search);
     passingVoucherId = query.get("voucher") || "";
-    var config = {
-      status: "Passing",
-      bodyId: "pv-passing-body",
-      countId: "pv-passing-count",
-      previewId: "pv-passing-preview",
-      feedbackId: "pv-passing-feedback",
-      primaryButtonId: "mark-pv-passed-btn",
-      rejectButtonId: "reject-passing-btn",
-      selectedGetter: function () { return passingVoucherId; },
-      selectedSetter: function (value) { passingVoucherId = value; },
-      reviewCopy: "Reviewing {voucher} for passing action.",
-      emptyCopy: "No voucher awaiting passing."
-    };
-    renderWorkflowQueue(config);
+    setPassingView(query.get("voucher") ? "detail" : "table", passingVoucherId);
+
+    function refreshPassingPage() {
+      var tableShell = $("pv-passing-table-shell");
+      var detailShell = $("pv-passing-detail-shell");
+      if (tableShell) {
+        tableShell.hidden = passingPageState.view === "detail";
+        tableShell.classList.toggle("table-view-layout", passingPageState.view !== "detail");
+      }
+      if (detailShell) {
+        detailShell.hidden = passingPageState.view !== "detail";
+      }
+      if (passingPageState.view === "detail") {
+        renderPassingDetail();
+      } else {
+        renderPassingTable();
+      }
+    }
+    passingRefreshPage = refreshPassingPage;
+
+    if ($("pv-passing-back")) {
+      $("pv-passing-back").addEventListener("click", function () {
+        setPassingView("table", "");
+        refreshPassingPage();
+      });
+    }
 
     $("mark-pv-passed-btn").addEventListener("click", function () {
       var vouchers = getVouchers();
-      var voucher = byId(vouchers, passingVoucherId);
+      var voucher = byId(vouchers, passingPageState.detailVoucherId || passingVoucherId);
       if (!voucher) {
         feedback("pv-passing-feedback", "Select a voucher first.", "error");
         return;
@@ -1319,9 +2822,9 @@
       write(STORE.vouchers, vouchers);
       logVoucherChange("Passing", "Passed payment voucher " + voucher.voucherNumber + ".");
       feedback("pv-passing-feedback", voucher.voucherNumber + " marked as passed.", "success");
-      passingVoucherId = "";
+      setPassingView("table", "");
       $("pv-passing-note").value = "";
-      renderWorkflowQueue(config);
+      refreshPassingPage();
     });
 
     $("reject-passing-btn").addEventListener("click", function () {
@@ -1330,16 +2833,18 @@
         feedback("pv-passing-feedback", "Enter a rejection note before returning the voucher to draft.", "error");
         return;
       }
-      var voucher = rejectVoucherToDraft(passingVoucherId, note, "Passing");
+      var voucher = rejectVoucherToDraft(passingPageState.detailVoucherId || passingVoucherId, note, "Passing");
       if (!voucher) {
         feedback("pv-passing-feedback", "Select a voucher first.", "error");
         return;
       }
       feedback("pv-passing-feedback", voucher.voucherNumber + " returned to draft.", "success");
-      passingVoucherId = "";
+      setPassingView("table", "");
       $("pv-passing-note").value = "";
-      renderWorkflowQueue(config);
+      refreshPassingPage();
     });
+
+    refreshPassingPage();
   }
 
   function initModuleTabs(defaultTarget) {
@@ -1377,6 +2882,12 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
+    if ($("rov-form-shell")) {
+      renderReceiptsPage();
+    }
+    if ($("receipt-approval-body")) {
+      renderReceiptApprovalPage();
+    }
     if ($("pv-form-shell")) {
       renderPaymentsPage();
     }

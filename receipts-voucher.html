@@ -3,51 +3,243 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Receipts (ROV) | LGA Finance Operations</title>
+  <title>Receipts (RV) | LGA Finance Operations</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="budget-admin.css"><link rel="stylesheet" href="voucher-admin.css">
 </head>
-<body>
+<body class="pv-page rov-page">
   <div class="app-shell">
-    <aside class="side-rail"><a class="rail-brand" href="dashboard.html"><span class="seal">PH</span><span class="rail-title"><strong>PHALGA Finance</strong><span>Rivers State</span></span></a><nav class="nav-group"><span class="nav-label">Control desk</span><a class="nav-item" href="dashboard.html"><span class="nav-icon">D</span><span>Dashboard</span><span class="nav-count">9</span></a><a class="nav-item" href="#"><span class="nav-icon">Q</span><span>Work Queue</span><span class="nav-count">18</span></a><details class="nav-details"><summary class="nav-parent"><span class="nav-icon">B</span><span>Budget</span><span class="nav-chevron" aria-hidden="true"></span></summary><div class="nav-submenu"><a href="departments-manage.html">Departments</a><a href="categories.html">Categories</a><a href="budget-items.html">Budget Items</a><a href="budget-year.html">Budget Year</a><a href="budget-funding.html">Budget Funding</a><a href="budget-imports.html">Imports</a><a href="budget-log.html">Log</a></div></details><details class="nav-details" open><summary class="nav-parent"><span class="nav-icon">V</span><span>Vouchers</span><span class="nav-chevron" aria-hidden="true"></span></summary><div class="nav-submenu"><a href="payments-voucher.html">Payments (PV)</a><a class="active" href="receipts-voucher.html">Receipts (ROV)</a><a href="approve-voucher.html">Checking</a><a href="passing-voucher.html">Passing</a></div></details><a class="nav-item" href="#"><span class="nav-icon">C</span><span>Cash and Bank</span></a><a class="nav-item" href="#"><span class="nav-icon">R</span><span>Reports</span></a><span class="nav-label">Administration</span><a class="nav-item" href="#"><span class="nav-icon">U</span><span>Users and Roles</span></a><a class="nav-item" href="#"><span class="nav-icon">S</span><span>Sync Monitor</span><span class="nav-count">6</span></a><a class="nav-item" href="dashboard.html#theme-management"><span class="nav-icon">T</span><span>Theme</span></a></nav></aside>
+    <aside class="side-rail"><a class="rail-brand" href="dashboard.html"><span class="seal">PH</span><span class="rail-title"><strong>PHALGA Finance</strong><span>Rivers State</span></span></a><nav class="nav-group"><span class="nav-label">Control desk</span><a class="nav-item" href="dashboard.html"><span class="nav-icon">D</span><span>Dashboard</span><span class="nav-count">9</span></a><a class="nav-item" href="#"><span class="nav-icon">Q</span><span>Work Queue</span><span class="nav-count">18</span></a><details class="nav-details"><summary class="nav-parent"><span class="nav-icon">B</span><span>Budget</span><span class="nav-chevron" aria-hidden="true"></span></summary><div class="nav-submenu"><a href="departments-manage.html">Departments</a><a href="categories.html">Categories</a><a href="budget-items.html">Budget Items</a><a href="budget-year.html">Budget Year</a><a href="budget-funding.html">Budget Funding</a><a href="budget-imports.html">Imports</a><a href="budget-log.html">Log</a></div></details><details class="nav-details" open><summary class="nav-parent"><span class="nav-icon">V</span><span>Vouchers</span><span class="nav-chevron" aria-hidden="true"></span></summary><div class="nav-submenu"><a href="payments-voucher.html">Payments (PV)</a><a href="approve-voucher.html">Checking (PV)</a><a href="passing-voucher.html">Passing (PV)</a><a class="active" href="receipts-voucher.html">Receipts (RV)</a><a href="receipt-approval.html">Approval (RV)</a></div></details><a class="nav-item" href="#"><span class="nav-icon">C</span><span>Cash and Bank</span></a><a class="nav-item" href="#"><span class="nav-icon">R</span><span>Reports</span></a><span class="nav-label">Administration</span><a class="nav-item" href="#"><span class="nav-icon">U</span><span>Users and Roles</span></a><a class="nav-item" href="#"><span class="nav-icon">S</span><span>Sync Monitor</span><span class="nav-count">6</span></a><a class="nav-item" href="dashboard.html#theme-management"><span class="nav-icon">T</span><span>Theme</span></a></nav></aside>
     <main class="content">
-      <header class="app-topbar"><div class="search-box"><span>Receipts voucher shell reserved for the next implementation pass</span></div><div class="shell-actions"><span class="status-pill info">ROV next</span><button class="shell-icon-button" type="button" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m4.8 13.4-.8-1.4.8-1.4 1.8-.3.9-1.6-.5-1.8 1.4-.8 1.4.8 1.6-.6.7-1.7h1.6l.7 1.7 1.6.6 1.4-.8 1.4.8-.5 1.8.9 1.6 1.8.3.8 1.4-.8 1.4-1.8.3-.9 1.6.5 1.8-1.4.8-1.4-.8-1.6.6-.7 1.7h-1.6l-.7-1.7-1.6-.6-1.4.8-1.4-.8.5-1.8-.9-1.6-1.8-.3Z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="1.5"/></svg><span class="sr-only">Settings</span></button><button class="shell-icon-button" type="button" title="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a4 4 0 0 0-4 4v2.4c0 .7-.2 1.4-.6 2L6 14.8V16h12v-1.2l-1.4-2.4c-.4-.6-.6-1.3-.6-2V8a4 4 0 0 0-4-4Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/><path d="M10 18a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/></svg><span class="shell-icon-badge">3</span><span class="sr-only">Notifications</span></button><button class="shell-icon-button profile" type="button" title="Current profile: Super Admin"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 19a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"/></svg><span class="sr-only">Current profile</span></button></div></header>
+      <header class="app-topbar"><div class="search-box"><span>Capture treasury receipts, classify them, and keep the register ready for inspection</span></div><div class="shell-actions"><span class="status-pill info">RV register</span><button class="shell-icon-button" type="button" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m4.8 13.4-.8-1.4.8-1.4 1.8-.3.9-1.6-.5-1.8 1.4-.8 1.4.8 1.6-.6.7-1.7h1.6l.7 1.7 1.6.6 1.4-.8 1.4.8-.5 1.8.9 1.6 1.8.3.8 1.4-.8 1.4-1.8.3-.9 1.6.5 1.8-1.4.8-1.4-.8-1.6.6-.7 1.7h-1.6l-.7-1.7-1.6-.6-1.4.8-1.4-.8.5-1.8-.9-1.6-1.8-.3Z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="1.5"/></svg><span class="sr-only">Settings</span></button><button class="shell-icon-button" type="button" title="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a4 4 0 0 0-4 4v2.4c0 .7-.2 1.4-.6 2L6 14.8V16h12v-1.2l-1.4-2.4c-.4-.6-.6-1.3-.6-2V8a4 4 0 0 0-4-4Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/><path d="M10 18a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/></svg><span class="shell-icon-badge">3</span><span class="sr-only">Notifications</span></button><button class="shell-icon-button profile" type="button" title="Current profile: Super Admin"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 19a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"/></svg><span class="sr-only">Current profile</span></button></div></header>
       <section class="main-view">
         <div class="view-header">
           <div>
             <p class="kicker">Voucher Operations</p>
-            <h1>Receipts (ROV)</h1>
-            <p>This shell reserves the receipts voucher workspace while the prototype delivers Payment Voucher first.</p>
+            <h1>Receipts (RV)</h1>
+            <p id="rov-instance-context">Rivers State / Port Harcourt LGA</p>
           </div>
         </div>
 
-        <section class="budget-layout">
-          <div class="rov-placeholder">
-            <section class="ops-panel rov-placeholder-card">
-              <h2>Receipts voucher is next</h2>
-              <p>The `Receipts (ROV)` interface will follow the same prototype language as `Payments (PV)`: structured data capture, read-only inspection, and workflow visibility.</p>
-              <p>For this pass, the navigation and page shell are ready so the module hierarchy is complete.</p>
-            </section>
-          </div>
+        <section class="module-tabs" role="tablist" aria-label="Receipt voucher views">
+          <button class="module-tab active" type="button" data-tab-target="rov-view-panel">View RV</button>
+          <button class="module-tab" type="button" data-tab-target="rov-manage-panel">Manage RV</button>
+        </section>
 
-          <aside class="ops-panel module-inspector">
-            <div class="panel-title">
-              <div>
-                <h2>ROV workspace</h2>
-                <p>Receipts voucher will be implemented in the next module pass.</p>
+        <section id="rov-view-panel" class="tab-panel active">
+          <div class="budget-layout table-view-layout">
+            <div class="side-stack">
+              <section class="ops-panel table-shell" id="rov-table-shell">
+                <div class="table-toolbar">
+                  <div class="table-toolbar-copy">
+                    <h2>Receipt register</h2>
+                    <p>Inspect saved treasury receipts, then open one for editing when needed.</p>
+                    <div class="table-export-actions" aria-label="Export actions">
+                      <button class="table-icon-tool" type="button" data-rov-export="excel" title="Export to Excel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h8l4 4v14H7z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15 3v5h5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m8.5 14.5 3-3m0 3-3-3m7-1.5h-3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.6"/></svg></button>
+                      <button class="table-icon-tool" type="button" data-rov-export="pdf" title="Export to PDF"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h8l4 4v14H7z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 13.5h6M9 17h4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.6"/></svg></button>
+                      <button class="table-icon-tool" type="button" data-rov-export="print" title="Print"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V4h10v4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 15H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-1" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 13h10v7H7z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+                    </div>
+                  </div>
+                  <div class="table-toolbar-actions">
+                    <a class="button slim primary" href="receipts-voucher.html?tab=manage">New receipt</a>
+                    <span class="status-pill info" id="rov-record-count">0 records</span>
+                  </div>
+                </div>
+                <div class="table-content enhanced-table">
+                  <table class="data-table admin-table">
+                    <thead><tr><th>TRV No.</th><th>Receipt No.</th><th>Date</th><th>Department</th><th>Category</th><th>Payment Method</th><th>Received From</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody id="rov-table-body"></tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section class="ops-panel" id="rov-preview-shell">
+                <div class="panel-title">
+                  <div>
+                    <h2>Receipt preview</h2>
+                    <p>Select a record in the table to inspect the saved entry.</p>
+                  </div>
+                </div>
+                <div id="rov-view-preview" class="voucher-preview-shell"></div>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <section id="rov-manage-panel" class="tab-panel">
+          <div class="budget-layout">
+            <div class="ops-panel department-form-panel">
+              <div class="form-panel-head">
+                <div>
+                  <h2>Receipt voucher draft</h2>
+                  <p>Capture and route the receipt.</p>
+                </div>
+                <span id="rov-status-pill" class="status-pill info">Draft</span>
+              </div>
+
+              <div class="voucher-command">
+                <div>
+                  <strong>Receipt workflow</strong>
+                  <p id="rov-manage-feedback">Draft receipt.</p>
+                </div>
+                <div class="department-actions-buttons">
+                  <a class="button slim" id="cancel-rov-edit" href="receipts-voucher.html?tab=view">Cancel edit</a>
+                  <button class="button slim" id="save-rov-draft" type="button">Save receipt</button>
+                  <button class="button primary slim" id="submit-rov-approval" type="button">Send for Approval</button>
+                </div>
+              </div>
+
+              <div class="voucher-form-stack" id="rov-form-shell">
+                <section class="voucher-form-section rov-overview-panel">
+                  <div class="rov-overview-grid">
+                    <article class="rov-overview-card">
+                      <span class="rov-overview-label">Office context</span>
+                      <strong>Revenue collection desk</strong>
+                    </article>
+                    <article class="rov-overview-card">
+                      <span class="rov-overview-label">Current mode</span>
+                      <strong>Draft workspace</strong>
+                    </article>
+                    <article class="rov-overview-card">
+                      <span class="rov-overview-label">Instance</span>
+                      <strong id="rov-overview-instance">Current instance</strong>
+                      <p id="rov-overview-instance-copy"></p>
+                    </article>
+                  </div>
+                </section>
+
+                <section class="voucher-form-section">
+                  <div class="rov-section-head">
+                    <div>
+                      <span class="rov-section-kicker">Identity</span>
+                      <h3>Receipt identity</h3>
+                    </div>
+                  </div>
+                  <div class="voucher-section-grid three-tight">
+                    <label class="field"><span>Treasury Receipt Voucher Number</span><input id="rov-treasury-number" type="text" placeholder="Enter treasury receipt voucher number"></label>
+                    <label class="field"><span>Receipt No.</span><input id="rov-receipt-no" type="text" placeholder="Enter receipt number"></label>
+                    <label class="field"><span>Date</span><input id="rov-date" type="date"></label>
+                  </div>
+                </section>
+
+                <section class="voucher-form-section">
+                  <div class="rov-entry-switch">
+                    <span class="voucher-entry-mode-label">Entry mode</span>
+                    <div class="voucher-mode-tabs">
+                      <button class="voucher-mode-tab active" type="button" data-rov-entry-mode="classification">Classification</button>
+                      <button class="voucher-mode-tab" type="button" data-rov-entry-mode="retireAdvance">Retire Advance</button>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="voucher-form-section" id="rov-retire-section" hidden>
+                  <div class="rov-section-head">
+                    <div>
+                      <span class="rov-section-kicker">Advance</span>
+                      <h3>Retire advance</h3>
+                    </div>
+                  </div>
+                  <div class="voucher-section-grid three-tight">
+                    <label class="field"><span>Advance</span><select id="rov-advance-id"></select></label>
+                    <div class="rov-advance-summary">
+                      <span class="rov-overview-label">Balance remaining</span>
+                      <strong id="rov-advance-balance">-</strong>
+                      <p id="rov-advance-status">Pick an advance to load the carried details.</p>
+                    </div>
+                  </div>
+                  <div class="rov-advance-grid">
+                    <div><span>Reference</span><strong id="rov-advance-reference">-</strong></div>
+                    <div><span>Holder</span><strong id="rov-advance-holder">-</strong></div>
+                    <div><span>Department</span><strong id="rov-advance-department">-</strong></div>
+                    <div><span>Category</span><strong id="rov-advance-category">-</strong></div>
+                    <div><span>Economic code</span><strong id="rov-advance-economic-code">-</strong></div>
+                    <div><span>Original amount</span><strong id="rov-advance-original-amount">-</strong></div>
+                    <div><span>Retired so far</span><strong id="rov-advance-retired-amount">-</strong></div>
+                    <div><span>Method</span><strong id="rov-advance-payment-method">-</strong></div>
+                  </div>
+                  <div class="voucher-section-grid three-tight rov-retire-fields">
+                    <label class="field"><span>Payment method</span><select id="rov-retire-payment-method"></select></label>
+                    <label class="field"><span>Received From</span><input id="rov-retire-received-from" type="text" placeholder="Linked advance holder"></label>
+                    <label class="field"><span>Payer Name</span><input id="rov-retire-payer-name" type="text" placeholder="Linked payer"></label>
+                    <label class="field"><span>Amount</span><input id="rov-retire-amount" type="text" data-money-input placeholder="0"></label>
+                    <label class="field"><span>Purpose / On Account Of</span><input id="rov-retire-purpose" type="text" placeholder="Advance retirement purpose"></label>
+                    <label class="field"><span>Cashier / Revenue Collector Name</span><input id="rov-retire-cashier-name" type="text" placeholder="Treasury officer name"></label>
+                    <label class="field"><span>Witness Name</span><input id="rov-retire-witness-name" type="text" placeholder="Witness name"></label>
+                  </div>
+                </section>
+
+                <section class="voucher-form-section" id="rov-classification-section">
+                  <div class="rov-section-head">
+                    <div>
+                      <span class="rov-section-kicker">Classification</span>
+                      <h3>Budget classification</h3>
+                    </div>
+                  </div>
+                  <div class="voucher-section-grid three-tight">
+                    <label class="field"><span>Department</span><select id="rov-department"></select></label>
+                    <label class="field"><span>Category</span><select id="rov-category"></select></label>
+                    <label class="field"><span>Economic code</span><select id="rov-economic-code"></select></label>
+                  </div>
+                </section>
+
+                <section class="voucher-form-section rov-collection-panel" id="rov-collection-section">
+                  <div class="rov-section-head">
+                    <div>
+                      <span class="rov-section-kicker">Collection</span>
+                      <h3>Payer and collection details</h3>
+                    </div>
+                  </div>
+                  <div class="voucher-section-grid three-tight">
+                    <label class="field"><span>Payment method</span><select id="rov-payment-method"></select></label>
+                    <label class="field"><span>Received From</span><input id="rov-received-from" type="text" placeholder="Who paid the money"></label>
+                    <label class="field"><span>Payer Name</span><input id="rov-payer-name" type="text" placeholder="Payer or representative name"></label>
+                    <label class="field"><span>Cashier / Revenue Collector Name</span><input id="rov-cashier-name" type="text" placeholder="Treasury officer name"></label>
+                    <label class="field"><span>Witness Name</span><input id="rov-witness-name" type="text" placeholder="Witness name"></label>
+                    <label class="field rov-amount-field"><span>Amount</span><input id="rov-amount" type="text" data-money-input placeholder="0"></label>
+                  </div>
+                </section>
+
+                <section class="voucher-form-section" id="rov-narration-section">
+                  <div class="rov-section-head">
+                    <div>
+                      <span class="rov-section-kicker">Narration</span>
+                      <h3>Narration and authorization</h3>
+                    </div>
+                  </div>
+                  <div class="voucher-section-grid rov-signoff-grid">
+                    <label class="field full"><span>Purpose / On Account Of</span><textarea id="rov-purpose" placeholder="Explain the receipt purpose"></textarea></label>
+                    <label class="field full"><span>Cashier / Revenue Collector Signature</span><input id="rov-cashier-signature" type="text" placeholder="Type the signature name or sign-off mark"></label>
+                  </div>
+                </section>
               </div>
             </div>
-            <div class="inspector-block">
-              <div class="inspector-row"><strong>Current view</strong><span>Placeholder</span></div>
-              <div class="inspector-row"><strong>Next step</strong><span>ROV field mapping</span></div>
-              <div class="inspector-row"><strong>Status</strong><span class="status-pill info">Queued</span></div>
-            </div>
-          </aside>
+
+            <aside class="ops-panel module-inspector">
+              <div class="panel-title">
+                <div>
+                  <h2>Receipt status</h2>
+                  <p>Live summary.</p>
+                </div>
+              </div>
+              <div class="inspector-block">
+                <div class="inspector-row"><strong>Status</strong><span id="rov-current-status">Draft</span></div>
+                <div class="inspector-row"><strong>Treasury No.</strong><span id="rov-current-number">New receipt</span></div>
+                <div class="inspector-row"><strong>Receipt No.</strong><span id="rov-current-receipt-no">-</span></div>
+                <div class="inspector-row"><strong>Department</strong><span id="rov-current-department">-</span></div>
+                <div class="inspector-row"><strong>Category</strong><span id="rov-current-category">-</span></div>
+                <div class="inspector-row"><strong>Payment method</strong><span id="rov-current-payment-method">Cash</span></div>
+                <div class="inspector-row"><strong>Amount</strong><span id="rov-current-amount">-</span></div>
+                <div class="inspector-row"><strong>Received from</strong><span id="rov-current-received-from">-</span></div>
+              </div>
+            </aside>
+          </div>
         </section>
       </section>
     </main>
   </div>
-  <script src="theme.js"></script>
+  <script src="theme.js"></script><script src="voucher-admin.js"></script>
 </body>
 </html>
+
+

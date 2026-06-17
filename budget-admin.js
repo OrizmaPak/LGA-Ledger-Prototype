@@ -19,29 +19,53 @@
     { id: "dept-finance", code: "FIN", name: "Finance", status: "Active" }
   ];
   var seedBanks = [
+    { id: "bank-cash", name: "Cash", description: "Cash float handled directly at the treasury desk.", accountName: "Cash on Hand" },
     { id: "bank-zenith-main", name: "Zenith Bank", description: "Primary operations account for statutory collections and daily treasury postings.", accountName: "PHALGA Main Treasury" },
     { id: "bank-first-projects", name: "First Bank", description: "Capital projects account used for infrastructure and intervention disbursements.", accountName: "PHALGA Capital Projects" },
     { id: "bank-uba-salary", name: "UBA", description: "Salary and payroll settlement account for approved staff payments.", accountName: "PHALGA Payroll Services" }
   ];
   var seedCategories = [
     { id: "cat-health-capital", code: "2202", name: "Primary Health Capital" },
+    { id: "cat-health-outreach", code: "2203", name: "Public Health Outreach" },
     { id: "cat-works-roads", code: "2301", name: "Road Maintenance" },
+    { id: "cat-works-maintenance", code: "2302", name: "Infrastructure Maintenance" },
     { id: "cat-education-grants", code: "2105", name: "Education Grants" },
+    { id: "cat-education-training", code: "2106", name: "Training and Capacity Building" },
     { id: "cat-admin-services", code: "2004", name: "Administrative Services" },
-    { id: "cat-community-support", code: "2403", name: "Community Support" }
+    { id: "cat-admin-utilities", code: "2005", name: "Office Utilities and Running Costs" },
+    { id: "cat-community-support", code: "2403", name: "Community Support" },
+    { id: "cat-community-engagement", code: "2404", name: "Community Engagement" },
+    { id: "cat-finance-control", code: "2006", name: "Revenue Control and Treasury Services" }
   ];
   var seedItems = [
     { id: "item-health-centres", categoryId: "cat-health-capital", code: "220201", name: "Primary health centre renovation" },
     { id: "item-health-equipment", categoryId: "cat-health-capital", code: "220202", name: "Rural clinic equipment" },
+    { id: "item-health-outreach", categoryId: "cat-health-outreach", code: "220301", name: "Medical outreach campaign" },
+    { id: "item-health-supplies", categoryId: "cat-health-outreach", code: "220302", name: "Essential medicines and consumables" },
     { id: "item-road-repairs", categoryId: "cat-works-roads", code: "230101", name: "Township road repairs" },
     { id: "item-drainage-desilt", categoryId: "cat-works-roads", code: "230102", name: "Drainage desilting works" },
-    { id: "item-school-support", categoryId: "cat-education-grants", code: "210501", name: "School support grants" }
+    { id: "item-street-lighting", categoryId: "cat-works-maintenance", code: "230201", name: "Street lighting maintenance" },
+    { id: "item-bridge-inspection", categoryId: "cat-works-maintenance", code: "230202", name: "Bridge inspection and repairs" },
+    { id: "item-school-support", categoryId: "cat-education-grants", code: "210501", name: "School support grants" },
+    { id: "item-learning-materials", categoryId: "cat-education-grants", code: "210502", name: "Learning materials distribution" },
+    { id: "item-teacher-training", categoryId: "cat-education-training", code: "210601", name: "Teacher development workshop" },
+    { id: "item-exam-logistics", categoryId: "cat-education-training", code: "210602", name: "Examination logistics support" },
+    { id: "item-office-consumables", categoryId: "cat-admin-services", code: "200401", name: "Office stationery and consumables" },
+    { id: "item-registry-support", categoryId: "cat-admin-services", code: "200402", name: "Records and registry support" },
+    { id: "item-utilities", categoryId: "cat-admin-utilities", code: "200501", name: "Electricity and water bills" },
+    { id: "item-maintenance", categoryId: "cat-admin-utilities", code: "200502", name: "Office maintenance and cleaning" },
+    { id: "item-ward-engagement", categoryId: "cat-community-support", code: "240301", name: "Ward liaison and support" },
+    { id: "item-youth-engagement", categoryId: "cat-community-engagement", code: "240401", name: "Youth and civic engagement forum" },
+    { id: "item-revenue-monitoring", categoryId: "cat-finance-control", code: "200601", name: "Revenue monitoring support" },
+    { id: "item-audit-coordination", categoryId: "cat-finance-control", code: "200602", name: "Audit and treasury coordination" }
   ];
   var seedFunding = [
     { id: "fund-health-centres-2026", year: "2026", departmentId: "dept-health", categoryId: "cat-health-capital", itemId: "item-health-centres", amount: 42000000 },
     { id: "fund-health-centres-2027", year: "2027", departmentId: "dept-health", categoryId: "cat-health-capital", itemId: "item-health-centres", amount: 46000000 },
+    { id: "fund-health-outreach-2026", year: "2026", departmentId: "dept-health", categoryId: "cat-health-outreach", itemId: "item-health-outreach", amount: 18500000 },
     { id: "fund-road-repairs-2026", year: "2026", departmentId: "dept-works", categoryId: "cat-works-roads", itemId: "item-road-repairs", amount: 78000000 },
     { id: "fund-drainage-desilt-2026", year: "2026", departmentId: "dept-works", categoryId: "cat-works-roads", itemId: "item-drainage-desilt", amount: 24000000 },
+    { id: "fund-works-maintenance-2026", year: "2026", departmentId: "dept-works", categoryId: "cat-works-maintenance", itemId: "item-street-lighting", amount: 12400000 },
     { id: "fund-school-support-2026", year: "2026", departmentId: "dept-education", categoryId: "cat-education-grants", itemId: "item-school-support", amount: 35000000 }
   ];
   var seedYears = [
@@ -87,16 +111,46 @@
     }
   }
 
+  function mergeSeedRecords(stored, seeds) {
+    var map = {};
+    var output = [];
+
+    (Array.isArray(stored) ? stored : []).forEach(function (item) {
+      if (!item || !item.id || map[item.id]) {
+        return;
+      }
+      map[item.id] = true;
+      output.push(item);
+    });
+
+    (Array.isArray(seeds) ? seeds : []).forEach(function (item) {
+      if (!item || !item.id || map[item.id]) {
+        return;
+      }
+      map[item.id] = true;
+      output.push(item);
+    });
+
+    return output;
+  }
+
   function data() {
     return {
-      departments: read(STORE.departments, seedDepartments),
+      departments: mergeSeedRecords(read(STORE.departments, []), seedDepartments),
       banks: read(STORE.banks, seedBanks),
-      categories: read(STORE.categories, seedCategories),
-      items: read(STORE.items, seedItems),
-      funding: read(STORE.funding, seedFunding),
-      years: read(STORE.years, seedYears),
-      logs: read(STORE.logs, seedLogs)
+      categories: mergeSeedRecords(read(STORE.categories, []), seedCategories),
+      items: mergeSeedRecords(read(STORE.items, []), seedItems),
+      funding: mergeSeedRecords(read(STORE.funding, []).map(normalizeFunding), seedFunding.map(normalizeFunding)),
+      years: mergeSeedRecords(read(STORE.years, []), seedYears),
+      logs: mergeSeedRecords(read(STORE.logs, []), seedLogs)
     };
+  }
+
+  function fundingTypes() {
+    return [
+      { id: "expenditure", name: "Expenditure funding" },
+      { id: "revenue", name: "Revenue funding" }
+    ];
   }
 
   function money(value) {
@@ -109,6 +163,19 @@
 
   function parseFundingAmount(value) {
     return Number(String(value || "").replace(/,/g, ""));
+  }
+
+  function normalizeFunding(raw) {
+    var base = raw || {};
+    return {
+      id: base.id || "fund-" + slug(base.departmentId || "") + "-" + slug(base.itemId || "") + "-" + slug(base.year || Date.now()),
+      year: String(base.year || ""),
+      fundingType: base.fundingType === "revenue" ? "revenue" : "expenditure",
+      departmentId: base.departmentId || "",
+      categoryId: base.categoryId || "",
+      itemId: base.itemId || "",
+      amount: Number(base.amount || 0) || 0
+    };
   }
 
   function stamp(value) {
@@ -1070,22 +1137,36 @@
 
   function renderFunding() {
     var d = data();
+    if ($("funding-type")) {
+      $("funding-type").innerHTML = optionList(fundingTypes(), $("funding-type").value || "expenditure", "Select funding type");
+      $("funding-type").value = $("funding-type").value || "expenditure";
+    }
     $("funding-department").innerHTML = optionList(d.departments, "", "Select department");
     if ($("funding-view-department")) {
+      $("funding-view-type").innerHTML = optionList(fundingTypes(), $("funding-view-type").value || "expenditure", "Select funding type");
       $("funding-view-department").innerHTML = optionList(d.departments, "", "All departments");
     }
     renderFundingSheet("manage");
     renderFundingSheet("view");
 
+    if ($("funding-type")) {
+      $("funding-type").addEventListener("change", function () {
+        renderFundingSheet("manage");
+      });
+    }
     $("funding-department").addEventListener("change", function () {
       renderFundingSheet("manage");
     });
     if ($("funding-view-department")) {
+      $("funding-view-type").addEventListener("change", function () {
+        renderFundingSheet("view");
+      });
       $("funding-view-department").addEventListener("change", function () {
         renderFundingSheet("view");
       });
     }
     $("save-funding").addEventListener("click", function () {
+      var fundingType = $("funding-type") ? $("funding-type").value || "expenditure" : "expenditure";
       var departmentId = $("funding-department").value;
       var cells = Array.from(document.querySelectorAll("[data-funding-cell]"));
       var existingFunding = d.funding.slice();
@@ -1102,7 +1183,7 @@
         var itemId = cell.getAttribute("data-item-id");
         var year = cell.getAttribute("data-year");
         var existing = existingFunding.find(function (entry) {
-          return entry.departmentId === departmentId && entry.categoryId === categoryId && entry.itemId === itemId && entry.year === year;
+          return entry.fundingType === fundingType && entry.departmentId === departmentId && entry.categoryId === categoryId && entry.itemId === itemId && entry.year === year;
         });
 
         if (!rawValue) {
@@ -1119,7 +1200,8 @@
           existing.amount = rawValue;
         } else {
           existingFunding.push({
-            id: "fund-" + departmentId + "-" + itemId + "-" + year,
+            id: "fund-" + fundingType + "-" + departmentId + "-" + itemId + "-" + year,
+            fundingType: fundingType,
             departmentId: departmentId,
             categoryId: categoryId,
             itemId: itemId,
@@ -1136,10 +1218,10 @@
       }
 
       write(STORE.funding, existingFunding);
-      logBudgetChange("Budget Funding", "Saved funding entries for " + ((byId(d.departments, departmentId) || {}).name || "selected department") + " across " + updated + " funding cell" + (updated === 1 ? "" : "s") + ".");
+      logBudgetChange("Budget Funding", "Saved " + fundingType + " funding entries for " + ((byId(d.departments, departmentId) || {}).name || "selected department") + " across " + updated + " funding cell" + (updated === 1 ? "" : "s") + ".");
       renderFundingSheet("manage");
       renderFundingSheet("view");
-      feedback("funding-feedback", "Funding saved for the selected department.", "success");
+      feedback("funding-feedback", "Funding saved for the selected department and funding type.", "success");
     });
   }
 
@@ -1158,6 +1240,8 @@
     var prefix = mode === "view" ? "funding-view" : "funding";
     var departmentField = $(prefix + "-department");
     var departmentId = departmentField ? departmentField.value : "";
+    var typeField = $(prefix + "-type");
+    var fundingType = typeField ? typeField.value || "expenditure" : "expenditure";
     var years = d.years.slice().sort(function (left, right) {
       return Number(left.year) - Number(right.year);
     });
@@ -1208,7 +1292,7 @@
         var itemRows = entry.items.map(function (item) {
           var cells = years.map(function (yearEntry) {
             var saved = d.funding.find(function (fund) {
-              return fund.departmentId === currentDepartmentId && fund.categoryId === entry.category.id && fund.itemId === item.id && fund.year === yearEntry.year;
+              return fund.fundingType === fundingType && fund.departmentId === currentDepartmentId && fund.categoryId === entry.category.id && fund.itemId === item.id && fund.year === yearEntry.year;
             });
             if (mode === "view") {
               return '<td><span class="funding-cell-value">' + (saved ? digits(saved.amount) : "-") + "</span></td>";
@@ -1238,7 +1322,7 @@
         ? (departmentId
           ? "Funding view loaded for the selected department. Empty values display as dashes."
           : "Funding view loaded for all departments. Empty values display as dashes.")
-        : "Funding sheet loaded for the selected department. Blank cells will not overwrite saved values."
+        : "Funding sheet loaded for the selected department and funding type. Blank cells will not overwrite saved values."
     );
   }
 

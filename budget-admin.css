@@ -28,7 +28,7 @@
 }
 
 .funding-sheet-top-grid {
-  grid-template-columns: minmax(240px, 0.9fr) minmax(0, 1.1fr);
+  grid-template-columns: minmax(220px, 0.8fr) minmax(240px, 0.9fr) minmax(0, 1.2fr);
   align-items: end;
 }
 
@@ -306,6 +306,8 @@
 
 .module-tab {
   position: relative;
+  display: inline-flex;
+  align-items: center;
   min-height: 42px;
   padding: 0 2px 10px;
   border: 0;
@@ -571,6 +573,14 @@
   border-color: rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.08);
   transform: translateX(2px);
+}
+
+.nav-submenu-note {
+  display: block;
+  padding: 6px 10px 2px 12px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 .table-shell {

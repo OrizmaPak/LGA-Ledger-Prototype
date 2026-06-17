@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCFPR | LGA Finance Operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="budget-admin.css">
+  <link rel="stylesheet" href="other-reports.css">
+</head>
+<body class="reports-page" data-report-type="scfpr">
+  <div class="app-shell">
+    <aside class="side-rail"><a class="rail-brand" href="dashboard.html"><span class="seal">PH</span><span class="rail-title"><strong>PHALGA Finance</strong><span>Rivers State</span></span></a><nav class="nav-group"><span class="nav-label">Control desk</span><a class="nav-item" href="dashboard.html"><span class="nav-icon">D</span><span>Dashboard</span><span class="nav-count">9</span></a><a class="nav-item" href="#"><span class="nav-icon">Q</span><span>Work Queue</span><span class="nav-count">18</span></a><details class="nav-details"><summary class="nav-parent"><span class="nav-icon">B</span><span>Budget</span><span class="nav-chevron" aria-hidden="true"></span></summary><div class="nav-submenu"><a href="departments-manage.html">Departments</a><a href="banks.html">Banks</a><a href="categories.html">Categories</a><a href="budget-items.html">Budget Items</a><a href="budget-year.html">Budget Year</a><a href="budget-funding.html">Budget Funding</a><a href="budget-imports.html">Imports</a><a href="budget-log.html">Log</a></div></details><details class="nav-details"><summary class="nav-parent"><span class="nav-icon">V</span><span>Vouchers</span><span class="nav-chevron" aria-hidden="true"></span></summary><div class="nav-submenu"><a href="payments-voucher.html">Payments (PV)</a><a href="approve-voucher.html">Checking (PV)</a><a href="passing-voucher.html">Passing (PV)</a><a href="receipts-voucher.html">Receipts (RV)</a><a href="receipt-approval.html">Approval (RV)</a></div></details><a class="nav-item" href="#"><span class="nav-icon">C</span><span>Cash and Bank</span></a><a class="nav-item" href="#"><span class="nav-icon">R</span><span>Reports</span></a><span class="nav-label">Administration</span><a class="nav-item" href="#"><span class="nav-icon">U</span><span>Users and Roles</span></a><a class="nav-item" href="#"><span class="nav-icon">S</span><span>Sync Monitor</span><span class="nav-count">6</span></a><a class="nav-item" href="dashboard.html#theme-management"><span class="nav-icon">T</span><span>Theme</span></a></nav></aside>
+    <main class="content">
+      <header class="app-topbar"><div class="search-box"><span>Consolidated statutory financial reports</span></div><div class="shell-actions"><span class="status-pill info">Other Reports</span></div></header>
+      <section class="main-view">
+        <div class="view-header"><div><p class="kicker">Other Reports</p><h1>Statement reports</h1><p>Yearly statutory statements generated from prototype financial data.</p></div><span class="status-pill ok">SCFPR</span></div>
+        <section class="ops-panel reports-filter-panel"><div class="reports-filter-grid"><label class="field"><span>Year</span><select id="report-year"></select></label><div class="reports-context"><strong>Report filter</strong><span>Only the selected year controls this statement.</span></div><div class="reports-actions"><button class="table-icon-tool" type="button" data-report-action="excel" title="Export to Excel">XLS</button><button class="table-icon-tool" type="button" data-report-action="pdf" title="Export to PDF">PDF</button><button class="table-icon-tool" type="button" data-report-action="print" title="Print">PRN</button></div></div></section>
+        <section class="ops-panel report-sheet-panel"><div class="report-sheet-head"><span id="report-code">SCFPR</span><h2 id="report-title">Statement of Consolidated Financial Performance</h2><h3 id="report-period">For the year ended 31st December</h3></div><div class="report-table-wrap"><table class="report-table" id="report-table"></table></div></section>
+      </section>
+    </main>
+  </div>
+  <script src="theme.js"></script><script src="other-reports.js"></script>
+</body>
+</html>

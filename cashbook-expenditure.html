@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cashbook Expenditure | LGA Finance Operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="budget-admin.css"><link rel="stylesheet" href="cashbook.css">
+</head>
+<body class="cashbook-page" data-cashbook-page="expenditure">
+  <div class="app-shell">
+    <aside class="side-rail"><a class="rail-brand" href="dashboard.html"><span class="seal">PH</span><span class="rail-title"><strong>PHALGA Finance</strong><span>Rivers State</span></span></a><nav class="nav-group"><span class="nav-label">Control desk</span><a class="nav-item" href="dashboard.html"><span class="nav-icon">D</span><span>Dashboard</span><span class="nav-count">9</span></a><a class="nav-item" href="#"><span class="nav-icon">Q</span><span>Work Queue</span><span class="nav-count">18</span></a><details class="nav-details"><summary class="nav-parent"><span class="nav-icon">B</span><span>Budget</span><span class="nav-chevron" aria-hidden="true"></span></summary><div class="nav-submenu"><a href="departments-manage.html">Departments</a><a href="banks.html">Banks</a><a href="categories.html">Categories</a><a href="budget-items.html">Budget Items</a><a href="budget-year.html">Budget Year</a><a href="budget-funding.html">Budget Funding</a><a href="budget-imports.html">Imports</a><a href="budget-log.html">Log</a></div></details><details class="nav-details"><summary class="nav-parent"><span class="nav-icon">V</span><span>Vouchers</span><span class="nav-chevron" aria-hidden="true"></span></summary><div class="nav-submenu"><a href="payments-voucher.html">Payments (PV)</a><a href="approve-voucher.html">Checking (PV)</a><a href="passing-voucher.html">Passing (PV)</a><a href="receipts-voucher.html">Receipts (RV)</a><a href="receipt-approval.html">Approval (RV)</a></div></details><a class="nav-item" href="#"><span class="nav-icon">C</span><span>Cash and Bank</span></a><a class="nav-item" href="#"><span class="nav-icon">R</span><span>Reports</span></a><span class="nav-label">Administration</span><a class="nav-item" href="#"><span class="nav-icon">U</span><span>Users and Roles</span></a><a class="nav-item" href="#"><span class="nav-icon">S</span><span>Sync Monitor</span><span class="nav-count">6</span></a><a class="nav-item" href="dashboard.html#theme-management"><span class="nav-icon">T</span><span>Theme</span></a></nav></aside>
+    <main class="content">
+      <header class="app-topbar"><div class="search-box"><span>Payment-side cashbook entries for expenditure</span></div><div class="shell-actions"><span class="status-pill warn">Expenditure</span></div></header>
+      <section class="main-view">
+        <div class="view-header">
+          <div>
+            <p class="kicker">Cashbook</p>
+            <h1>Expenditure</h1>
+            <p>Payment-side cashbook records showing payee, voucher reference, bank split, expenditure, advances, deposits, refunds, and analysis total.</p>
+          </div>
+        </div>
+
+        <section class="cashbook-summary-grid" id="cashbook-summary"></section>
+
+        <section class="budget-layout">
+          <div class="ops-panel table-shell cashbook-table-shell">
+            <div class="table-toolbar">
+              <div class="table-toolbar-copy">
+                <h2>Expenditure cashbook</h2>
+                <p>Bank columns are generated from the bank setup records and the cashbook sample fallback.</p>
+              </div>
+              <div class="table-toolbar-actions">
+                <div class="table-export-actions" aria-label="Export actions">
+                  <button class="table-icon-tool" type="button" data-cashbook-export="excel" title="Export to Excel">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h8l4 4v14H7z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15 3v5h5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m8.5 14.5 3-3m0 3-3-3m7-1.5h-3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.6"/></svg>
+                  </button>
+                  <button class="table-icon-tool" type="button" data-cashbook-export="pdf" title="Export to PDF">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h8l4 4v14H7z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 13.5h6M9 17h4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.6"/></svg>
+                  </button>
+                  <button class="table-icon-tool" type="button" data-cashbook-export="print" title="Print">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V4h10v4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 15H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-1" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 13h10v7H7z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                  </button>
+                </div>
+                <span class="status-pill info" id="cashbook-count">0 records</span>
+              </div>
+            </div>
+            <div class="cashbook-tools">
+              <div class="cashbook-range-group">
+                <label class="cashbook-range-field"><span>Start Date</span><input id="cashbook-start-date" type="date"></label>
+                <label class="cashbook-range-field"><span>End Date</span><input id="cashbook-end-date" type="date"></label>
+              </div>
+              <label class="cashbook-search"><span>Search expenditure</span><input id="cashbook-search" type="search" placeholder="Search date, payee, particulars, voucher number"></label>
+            </div>
+            <div class="cashbook-table-wrap">
+              <table class="data-table cashbook-table" id="cashbook-table">
+                <thead id="cashbook-head"></thead>
+                <tbody id="cashbook-body"></tbody>
+              </table>
+            </div>
+            <div class="cashbook-meta-strip"><span id="cashbook-range-chip"></span><span id="cashbook-bank-source"></span><span>Source sample: Ukwuani cashbook, June 2026.</span></div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+  <script src="theme.js"></script><script src="cashbook.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salary Ledger | LGA Finance Operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="budget-admin.css">
+  <link rel="stylesheet" href="ledger.css">
+</head>
+<body class="ledger-page salary-ledger-page" data-ledger-type="salary" data-ledger-short-label="Salary" data-ledger-full-label="Salary Ledger">
+  <div class="app-shell">
+    <aside class="side-rail">
+      <a class="rail-brand" href="dashboard.html">
+        <span class="seal">PH</span>
+        <span class="rail-title">
+          <strong>PHALGA Finance</strong>
+          <span>Rivers State</span>
+        </span>
+      </a>
+      <nav class="nav-group">
+        <span class="nav-label">Control desk</span>
+        <a class="nav-item" href="dashboard.html"><span class="nav-icon">D</span><span>Dashboard</span><span class="nav-count">9</span></a>
+        <a class="nav-item" href="#"><span class="nav-icon">Q</span><span>Work Queue</span><span class="nav-count">18</span></a>
+        <details class="nav-details">
+          <summary class="nav-parent"><span class="nav-icon">B</span><span>Budget</span><span class="nav-chevron" aria-hidden="true"></span></summary>
+          <div class="nav-submenu">
+            <a href="departments-manage.html">Departments</a>
+            <a href="banks.html">Banks</a>
+            <a href="categories.html">Categories</a>
+            <a href="budget-items.html">Budget Items</a>
+            <a href="budget-year.html">Budget Year</a>
+            <a href="budget-funding.html">Budget Funding</a>
+            <a href="budget-imports.html">Imports</a>
+            <a href="budget-log.html">Log</a>
+          </div>
+        </details>
+        <details class="nav-details">
+          <summary class="nav-parent"><span class="nav-icon">V</span><span>Vouchers</span><span class="nav-chevron" aria-hidden="true"></span></summary>
+          <div class="nav-submenu">
+            <a href="payments-voucher.html">Payments (PV)</a>
+            <a href="approve-voucher.html">Checking (PV)</a>
+            <a href="passing-voucher.html">Passing (PV)</a>
+            <a href="receipts-voucher.html">Receipts (RV)</a>
+            <a href="receipt-approval.html">Approval (RV)</a>
+          </div>
+        </details>
+        <a class="nav-item" href="#"><span class="nav-icon">C</span><span>Cashbook</span></a>
+        <a class="nav-item" href="#"><span class="nav-icon">R</span><span>Reports</span></a>
+        <span class="nav-label">Administration</span>
+        <a class="nav-item" href="#"><span class="nav-icon">U</span><span>Users and Roles</span></a>
+        <a class="nav-item" href="#"><span class="nav-icon">S</span><span>Sync Monitor</span><span class="nav-count">6</span></a>
+        <a class="nav-item" href="dashboard.html#theme-management"><span class="nav-icon">T</span><span>Theme</span></a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <header class="app-topbar">
+        <div class="search-box"><span>Salary ledger template, monthly imports, and uploaded salary voucher previews</span></div>
+        <div class="shell-actions">
+          <span class="status-pill info">Ledger</span>
+        </div>
+      </header>
+
+      <section class="main-view">
+        <div class="view-header ledger-view-header">
+          <div>
+            <p class="kicker">Ledger</p>
+            <h1>Salary Ledger</h1>
+            <p>Manage salary uploads year by year, download the standard template, import monthly Excel files, and preview uploaded salary voucher data.</p>
+          </div>
+          <div class="ledger-header-copy">
+            <span class="status-pill ok">Salary active</span>
+            <span class="status-pill info" id="ledger-category-count">0 files</span>
+          </div>
+        </div>
+
+        <section class="ops-panel ledger-filter-panel">
+          <div class="ledger-control-grid salary-control-grid">
+            <label class="field">
+              <span>Budget year</span>
+              <select id="dvea-year"></select>
+            </label>
+            <div class="ledger-control-note">
+              <strong>Year filter</strong>
+              <span>The selected year controls the monthly import list and uploaded salary voucher view.</span>
+            </div>
+            <div class="table-export-actions ledger-export-actions" aria-label="Export actions">
+              <button class="table-icon-tool" type="button" data-ledger-export="excel" title="Export active table to Excel">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h8l4 4v14H7z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15 3v5h5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m8.5 14.5 3-3m0 3-3-3m7-1.5h-3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.6"/></svg>
+              </button>
+              <button class="table-icon-tool" type="button" data-ledger-export="pdf" title="Export active table to PDF">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h8l4 4v14H7z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 13.5h6M9 17h4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.6"/></svg>
+              </button>
+              <button class="table-icon-tool" type="button" data-ledger-export="print" title="Print active table">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V4h10v4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 15H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-1" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 13h10v7H7z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="module-tabs" role="tablist" aria-label="Salary ledger views">
+          <button class="module-tab active" type="button" data-salary-tab="template">Template</button>
+          <button class="module-tab" type="button" data-salary-tab="import">Monthly Import</button>
+          <button class="module-tab" type="button" data-salary-tab="view">View Uploads</button>
+        </section>
+
+        <div id="salary-ledger-panel"></div>
+
+        <div class="ledger-empty-state" hidden>
+          <span id="ledger-instance-copy"></span>
+          <span id="ledger-head-code"></span>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="theme.js"></script>
+  <script src="ledger.js"></script>
+</body>
+</html>

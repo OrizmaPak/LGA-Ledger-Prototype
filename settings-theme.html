@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Theme and Identity | LGA Finance Operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="budget-admin.css">
+  <link rel="stylesheet" href="admin-ops.css">
+</head>
+<body data-page="settings-theme">
+  <div class="app-shell">
+    <aside class="side-rail">
+      <a class="rail-brand" href="dashboard.html"><span class="seal">LG</span><span class="rail-title"><strong>LGA Finance</strong><span>Operations workspace</span></span></a>
+      <nav class="nav-group">
+        <span class="nav-label">Control desk</span>
+        <a class="nav-item" href="dashboard.html"><span class="nav-icon">D</span><span>Dashboard</span><span class="nav-count">9</span></a>
+        <a class="nav-item" href="work-queue.html"><span class="nav-icon">Q</span><span>Work Queue</span><span class="nav-count">18</span></a>
+        <details class="nav-details"><summary class="nav-parent"><span class="nav-icon">B</span><span>Budget</span><span class="nav-chevron" aria-hidden="true"></span></summary><div class="nav-submenu"><a href="departments-manage.html">Departments</a><a href="banks.html">Banks</a><a href="categories.html">Categories</a><a href="budget-items.html">Budget Items</a><a href="budget-year.html">Budget Year</a><a href="budget-funding.html">Budget Funding</a><a href="budget-imports.html">Imports</a><a href="budget-log.html">Log</a></div></details>
+        <details class="nav-details"><summary class="nav-parent"><span class="nav-icon">V</span><span>Vouchers</span><span class="nav-chevron" aria-hidden="true"></span></summary><div class="nav-submenu"><a href="payments-voucher.html">Payments (PV)</a><a href="approve-voucher.html">Checking (PV)</a><a href="passing-voucher.html">Passing (PV)</a><a href="receipts-voucher.html">Receipts (RV)</a><a href="receipt-approval.html">Approval (RV)</a></div></details>
+        <a class="nav-item" href="#"><span class="nav-icon">C</span><span>Cashbook</span></a>
+        <a class="nav-item" href="#"><span class="nav-icon">R</span><span>Reports</span></a>
+        <span class="nav-label">Administration</span>
+        <a class="nav-item" href="#"><span class="nav-icon">U</span><span>Users and Roles</span></a>
+        <a class="nav-item" href="dashboard.html#theme-management"><span class="nav-icon">T</span><span>Theme</span></a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <header class="app-topbar">
+        <div class="search-box"><span>Identity colors, visual consistency, and instance branding preferences</span></div>
+        <div class="shell-actions"><span class="status-pill ok">Visual controls</span></div>
+      </header>
+
+      <section class="main-view">
+        <div class="view-header">
+          <div>
+            <p class="kicker">Administration</p>
+            <h1>Theme & Identity</h1>
+            <p>The old theme shortcut is now placed properly inside settings.</p>
+          </div>
+        </div>
+
+        <section class="module-tabs">
+          <a class="module-tab" href="settings-organization.html">Organization</a>
+          <a class="module-tab" href="settings-permissions.html">Rules & Permissions</a>
+          <a class="module-tab active" href="settings-theme.html">Theme & Identity</a>
+        </section>
+
+        <section class="settings-grid">
+          <section class="settings-card">
+            <h3>Theme selection</h3>
+            <p>Switch the active prototype theme for the current instance.</p>
+            <div class="theme-options">
+              <button class="theme-chip active" type="button" data-theme-choice="green"><span class="swatch swatch-green"></span>Government Green</button>
+              <button class="theme-chip" type="button" data-theme-choice="blue"><span class="swatch swatch-blue"></span>Administrative Blue</button>
+              <button class="theme-chip" type="button" data-theme-choice="gold"><span class="swatch swatch-gold"></span>Civic Gold</button>
+            </div>
+          </section>
+
+          <aside class="ops-panel">
+            <div class="panel-title">
+              <div>
+                <h2>Identity scope</h2>
+                <p>One product system with localized identity.</p>
+              </div>
+            </div>
+            <div class="settings-list">
+              <div class="settings-row"><strong>Instance</strong><span id="theme-instance-copy">-</span></div>
+              <div class="settings-row"><strong>Layout model</strong><span>Shared across all interfaces</span></div>
+              <div class="settings-row"><strong>Identity controls</strong><span>Colors, seal, local labels</span></div>
+            </div>
+          </aside>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="theme.js"></script>
+  <script src="admin-ops.js"></script>
+</body>
+</html>
